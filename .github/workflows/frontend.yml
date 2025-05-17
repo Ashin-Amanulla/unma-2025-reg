@@ -39,7 +39,7 @@ jobs:
 
       # Step 4: Rename the build output directory (if required)
       - name: Rename dist to unma-frontend
-        run: mv ./dist ./unma-frontend
+        run: mv ./unma2025-frontend/dist ./unma-frontend
 
       # Step 5: Copy files to Lightsail
       - name: Copy Files to Lightsail
