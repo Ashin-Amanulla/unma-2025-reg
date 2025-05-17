@@ -1,0 +1,154 @@
+.phone-input {
+  width: 100%;
+}
+
+.phone-input .form-control {
+  width: 100%;
+  height: 42px;
+  padding: 0.375rem 0.75rem;
+  font-size: 1rem;
+  line-height: 1.5;
+  color: #495057;
+  background-color: #fff;
+  border: 1px solid #ced4da;
+  border-radius: 0.25rem;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.phone-input .flag-dropdown {
+  border: 1px solid #ced4da;
+  border-right: none;
+  border-radius: 0.25rem 0 0 0.25rem;
+}
+
+.phone-input .form-control:focus {
+  border-color: #80bdff;
+  outline: 0;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.phone-input .country-dropdown {
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.phone-input .country-search {
+  padding: 8px;
+  border: 1px solid #ced4da;
+  border-radius: 4px;
+  margin: 5px;
+  width: calc(100% - 10px);
+}
+
+.phone-input .country-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.phone-input .country-list .country {
+  padding: 8px 10px;
+  cursor: pointer;
+}
+
+.phone-input .country-list .country:hover {
+  background-color: #f8f9fa;
+}
+
+.phone-input .country-list .country.highlight {
+  background-color: #e9ecef;
+}
+
+.phone-input .country-list .country.dial-code {
+  color: #6c757d;
+}
+
+.phone-input .country-list .country.selected {
+  background-color: #e9ecef;
+  font-weight: 500;
+}
+
+/* Country Select Styles */
+.react-select-container {
+  width: 100%;
+}
+
+.react-select__control {
+  min-height: 42px;
+  border-color: #ced4da !important;
+  box-shadow: none !important;
+  border-radius: 0.375rem !important;
+}
+
+.react-select__control:hover {
+  border-color: #80bdff !important;
+}
+
+.react-select__control--is-focused {
+  border-color: #80bdff !important;
+  box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25) !important;
+}
+
+.react-select__menu {
+  border: 1px solid #ced4da;
+  border-radius: 0.375rem;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.react-select__option {
+  padding: 8px 12px;
+  cursor: pointer;
+}
+
+.react-select__option--is-focused {
+  background-color: #f8f9fa;
+}
+
+.react-select__option--is-selected {
+  background-color: #e9ecef;
+  color: #212529;
+  font-weight: 500;
+}
+
+.react-select__input-container {
+  margin: 0;
+  padding: 0;
+}
+
+.react-select__value-container {
+  padding: 0 12px;
+}
+
+.react-select__placeholder {
+  color: #6c757d;
+}
+
+.react-select__single-value {
+  color: #212529;
+}
+
+.react-select__indicators {
+  height: 40px;
+}
+
+.react-select__indicator-separator {
+  display: none;
+}
+
+.react-select__clear-indicator {
+  color: #6c757d;
+  cursor: pointer;
+}
+
+.react-select__clear-indicator:hover {
+  color: #dc3545;
+}
+
+.react-select__dropdown-indicator {
+  color: #6c757d;
+}
+
+.react-select__dropdown-indicator:hover {
+  color: #495057;
+}

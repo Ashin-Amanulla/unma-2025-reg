@@ -1,0 +1,541 @@
+openapi: 3.0.0
+tags:
+  - name: Admin
+    description: Admin endpoints for managing events and registrations
+
+paths:
+  /api/admin/registrations:
+    get:
+      tags:
+        - Admin
+      summary: Get all registrations
+      description: Returns a list of all registrations (admin only)
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/RegistrationSummary'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden - Admin access required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+        - bearerAuth: []
+
+  /api/admin/registrations/{id}:
+    get:
+      tags:
+        - Admin
+      summary: Get registration by ID
+      description: Returns detailed information for a specific registration (admin only)
+      parameters:
+        - name: id
+          in: path
+          description: ID of the registration to retrieve
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    $ref: '#/components/schemas/RegistrationDetail'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden - Admin access required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Registration not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+        - bearerAuth: []
+
+  /api/admin/events:
+    post:
+      tags:
+        - Admin
+      summary: Create new event
+      description: Creates a new event (admin only)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventRequest'
+      responses:
+        '201':
+          description: Event created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Event created successfully
+                  data:
+                    $ref: '#/components/schemas/EventResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden - Admin access required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+        - bearerAuth: []
+
+  /api/admin/events/{id}:
+    put:
+      tags:
+        - Admin
+      summary: Update event
+      description: Updates an existing event (admin only)
+      parameters:
+        - name: id
+          in: path
+          description: ID of the event to update
+          required: true
+          schema:
+            type: integer
+            format: int64
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventRequest'
+      responses:
+        '200':
+          description: Event updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Event updated successfully
+                  data:
+                    $ref: '#/components/schemas/EventResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden - Admin access required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '404':
+          description: Event not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+        - bearerAuth: []
+
+  /api/admin/dashboard:
+    get:
+      tags:
+        - Admin
+      summary: Get dashboard statistics
+      description: Returns statistics for the admin dashboard (admin only)
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  data:
+                    $ref: '#/components/schemas/DashboardStats'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '403':
+          description: Forbidden - Admin access required
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security:
+        - bearerAuth: []
+
+components:
+  schemas:
+    RegistrationSummary:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 10001
+        eventId:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: John Smith
+        email:
+          type: string
+          format: email
+          example: john@example.com
+        phone:
+          type: string
+          example: +1234567890
+        status:
+          type: string
+          enum: [PENDING, VERIFIED, PAID, CANCELED]
+          example: PAID
+        createdAt:
+          type: string
+          format: date-time
+          example: 2025-01-15T14:23:45Z
+        paidAt:
+          type: string
+          format: date-time
+          example: 2025-01-15T14:30:12Z
+          nullable: true
+
+    RegistrationDetail:
+      allOf:
+        - $ref: '#/components/schemas/RegistrationSummary'
+        - type: object
+          properties:
+            paymentDetails:
+              type: object
+              properties:
+                paymentId:
+                  type: string
+                  example: PAY-123456789
+                amount:
+                  type: number
+                  format: float
+                  example: 299.99
+                method:
+                  type: string
+                  example: Credit Card
+                cardLast4:
+                  type: string
+                  example: '4242'
+
+    EventRequest:
+      type: object
+      required:
+        - title
+        - description
+        - date
+        - location
+        - price
+        - capacity
+      properties:
+        title:
+          type: string
+          example: UNMA Annual Conference 2025
+          minLength: 5
+          maxLength: 100
+        description:
+          type: string
+          example: Join us for the annual UNMA conference featuring keynote speakers and networking opportunities.
+          minLength: 10
+          maxLength: 1000
+        date:
+          type: string
+          format: date-time
+          example: 2025-06-15T09:00:00Z
+        location:
+          type: string
+          example: Grand Hotel, New York
+          minLength: 5
+          maxLength: 200
+        price:
+          type: number
+          format: float
+          example: 299.99
+          minimum: 0
+        capacity:
+          type: integer
+          example: 500
+          minimum: 1
+        image:
+          type: string
+          format: uri
+          example: https://example.com/event.jpg
+        agenda:
+          type: array
+          items:
+            type: object
+            required:
+              - time
+              - title
+            properties:
+              time:
+                type: string
+                example: 09:00 AM
+              title:
+                type: string
+                example: Registration & Breakfast
+        speakers:
+          type: array
+          items:
+            type: object
+            required:
+              - name
+            properties:
+              name:
+                type: string
+                example: Dr. Jane Smith
+              bio:
+                type: string
+                example: Leading expert in the field
+              image:
+                type: string
+                format: uri
+                example: https://example.com/speaker1.jpg
+
+    EventResponse:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        title:
+          type: string
+          example: UNMA Annual Conference 2025
+        description:
+          type: string
+          example: Join us for the annual UNMA conference featuring keynote speakers and networking opportunities.
+        date:
+          type: string
+          format: date-time
+          example: 2025-06-15T09:00:00Z
+        location:
+          type: string
+          example: Grand Hotel, New York
+        price:
+          type: number
+          format: float
+          example: 299.99
+        capacity:
+          type: integer
+          example: 500
+        image:
+          type: string
+          format: uri
+          example: https://example.com/event.jpg
+        isActive:
+          type: boolean
+          example: true
+        createdAt:
+          type: string
+          format: date-time
+          example: 2025-01-15T14:23:45Z
+        updatedAt:
+          type: string
+          format: date-time
+          example: 2025-01-15T14:23:45Z
+        agenda:
+          type: array
+          items:
+            type: object
+            properties:
+              time:
+                type: string
+                example: 09:00 AM
+              title:
+                type: string
+                example: Registration & Breakfast
+        speakers:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                example: Dr. Jane Smith
+              bio:
+                type: string
+                example: Leading expert in the field
+              image:
+                type: string
+                format: uri
+                example: https://example.com/speaker1.jpg
+
+    DashboardStats:
+      type: object
+      properties:
+        totalRegistrations:
+          type: integer
+          example: 315
+        totalRevenue:
+          type: number
+          format: float
+          example: 78750.25
+        activeEvents:
+          type: integer
+          example: 3
+        upcomingEvents:
+          type: integer
+          example: 2
+        registrationsLastWeek:
+          type: integer
+          example: 42
+        registrationsByEvent:
+          type: array
+          items:
+            type: object
+            properties:
+              eventId:
+                type: integer
+                example: 1
+              eventName:
+                type: string
+                example: UNMA Annual Conference 2025
+              count:
+                type: integer
+                example: 230
+        revenueByMonth:
+          type: array
+          items:
+            type: object
+            properties:
+              month:
+                type: string
+                example: Jan
+              revenue:
+                type: number
+                format: float
+                example: 12500
+
+    ValidationError:
+      type: object
+      properties:
+        status:
+          type: string
+          example: error
+        message:
+          type: string
+          example: Validation error
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+                example: title
+              message:
+                type: string
+                example: Title must be at least 5 characters long
+
+    Error:
+      type: object
+      properties:
+        status:
+          type: string
+          example: error
+        message:
+          type: string
+          example: Internal server error 

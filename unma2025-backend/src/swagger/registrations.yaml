@@ -1,0 +1,376 @@
+openapi: 3.0.0
+tags:
+  - name: Registrations
+    description: Registration and payment endpoints
+
+paths:
+  /api/registrations:
+    post:
+      tags:
+        - Registrations
+      summary: Create new registration
+      description: Create a new registration for an event
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegistrationRequest'
+      responses:
+        '201':
+          description: Registration created successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Registration created successfully
+                  data:
+                    $ref: '#/components/schemas/Registration'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security: []
+
+  /api/registrations/send-otp:
+    post:
+      tags:
+        - Registrations
+      summary: Send OTP
+      description: Send a verification code via email or SMS
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OTPRequest'
+      responses:
+        '200':
+          description: OTP sent successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: OTP sent successfully
+                  otp:
+                    type: string
+                    example: '1234'
+                    description: Only included in development environment
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security: []
+
+  /api/registrations/verify-otp:
+    post:
+      tags:
+        - Registrations
+      summary: Verify OTP
+      description: Verify the OTP code sent to the user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OTPVerificationRequest'
+      responses:
+        '200':
+          description: OTP verified successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: OTP verified successfully
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '401':
+          description: Invalid OTP
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security: []
+
+  /api/registrations/{id}/payment:
+    post:
+      tags:
+        - Registrations
+      summary: Process payment
+      description: Process payment for a registration
+      parameters:
+        - name: id
+          in: path
+          description: ID of the registration
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PaymentRequest'
+      responses:
+        '200':
+          description: Payment processed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: success
+                  message:
+                    type: string
+                    example: Payment processed successfully
+                  data:
+                    $ref: '#/components/schemas/PaymentResponse'
+        '400':
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidationError'
+        '404':
+          description: Registration not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+      security: []
+
+components:
+  schemas:
+    RegistrationRequest:
+      type: object
+      required:
+        - name
+        - email
+        - phone
+        - eventId
+      properties:
+        name:
+          type: string
+          example: John Smith
+          minLength: 2
+          maxLength: 100
+        email:
+          type: string
+          format: email
+          example: john@example.com
+        phone:
+          type: string
+          example: +1234567890
+          pattern: ^\+?[0-9]{10,15}$
+        eventId:
+          type: integer
+          example: 1
+        additionalDetails:
+          type: object
+          example:
+            specialRequirements: Vegetarian food
+            company: ABC Corp
+
+    Registration:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 10001
+        eventId:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: John Smith
+        email:
+          type: string
+          format: email
+          example: john@example.com
+        phone:
+          type: string
+          example: +1234567890
+        status:
+          type: string
+          enum: [PENDING, VERIFIED, PAID, CANCELED]
+          example: PENDING
+        createdAt:
+          type: string
+          format: date-time
+          example: 2025-01-15T14:23:45Z
+        additionalDetails:
+          type: object
+          example:
+            specialRequirements: Vegetarian food
+            company: ABC Corp
+
+    OTPRequest:
+      type: object
+      required:
+        - email
+        - phone
+      properties:
+        email:
+          type: string
+          format: email
+          example: john@example.com
+        phone:
+          type: string
+          example: +1234567890
+          pattern: ^\+?[0-9]{10,15}$
+
+    OTPVerificationRequest:
+      type: object
+      required:
+        - email
+        - phone
+        - otp
+      properties:
+        email:
+          type: string
+          format: email
+          example: john@example.com
+        phone:
+          type: string
+          example: +1234567890
+          pattern: ^\+?[0-9]{10,15}$
+        otp:
+          type: string
+          example: '1234'
+          pattern: ^[0-9]{4,6}$
+
+    PaymentRequest:
+      type: object
+      required:
+        - amount
+        - cardNumber
+        - cardExpiry
+        - cardCvc
+        - billingName
+      properties:
+        amount:
+          type: number
+          format: float
+          example: 299.99
+        cardNumber:
+          type: string
+          example: '4242424242424242'
+          pattern: ^[0-9]{13,19}$
+        cardExpiry:
+          type: string
+          example: '12/25'
+          pattern: ^(0[1-9]|1[0-2])\/([0-9]{2})$
+        cardCvc:
+          type: string
+          example: '123'
+          pattern: ^[0-9]{3,4}$
+        billingName:
+          type: string
+          example: John Smith
+          minLength: 2
+          maxLength: 100
+
+    PaymentResponse:
+      type: object
+      properties:
+        registrationId:
+          type: string
+          example: '10001'
+        paymentId:
+          type: string
+          example: PAY-1a2b3c4d5e
+        status:
+          type: string
+          enum: [PENDING, COMPLETED, FAILED, REFUNDED]
+          example: COMPLETED
+        amount:
+          type: number
+          format: float
+          example: 299.99
+        paidAt:
+          type: string
+          format: date-time
+          example: 2025-01-15T14:30:12Z
+
+    ValidationError:
+      type: object
+      properties:
+        status:
+          type: string
+          example: error
+        message:
+          type: string
+          example: Validation error
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+                example: email
+              message:
+                type: string
+                example: Email must be a valid email address
+
+    Error:
+      type: object
+      properties:
+        status:
+          type: string
+          example: error
+        message:
+          type: string
+          example: Internal server error 
