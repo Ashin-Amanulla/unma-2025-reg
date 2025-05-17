@@ -2,8 +2,12 @@ name: Deploy React App to AWS Lightsail
 
 on:
   push:
+    paths:
+      - "unma2025-frontend/**"
+      - ".github/workflows/frontend.yml"
     branches:
       - main
+  workflow_dispatch:
 
 jobs:
   deploy:
@@ -22,6 +26,7 @@ jobs:
 
       # Step 3: Install dependencies and build the project
       - name: Install Dependencies and Build
+        working-directory: ./unma2025-frontend
         env: # Inject environment variables from GitHub Secrets
           VITE_RAZORPAY_KEY_ID: ${{ secrets.VITE_RAZORPAY_KEY_ID }}
           VITE_RAZORPAY_KEY_SECRET: ${{ secrets.VITE_RAZORPAY_KEY_SECRET }}
