@@ -45,9 +45,9 @@ jobs:
       - name: Copy Files to Lightsail
         uses: appleboy/scp-action@v0.1.3
         with:
-          host: ${{ secrets.LIGHTSAIL_HOST }}
-          username: ${{ secrets.LIGHTSAIL_USER }}
-          key: ${{ secrets.LIGHTSAIL_KEY }}
+          host: ${{ secrets.LIGHTSAIL_INSTANCE_IP }}
+          username: ubuntu
+          key: ${{ secrets.LIGHTSAIL_PRIVATE_KEY }}
           source: ./unma-frontend/
           target: ~/deploy-temp/
 
@@ -55,9 +55,9 @@ jobs:
       - name: Deploy on Lightsail
         uses: appleboy/ssh-action@v0.1.6
         with:
-          host: ${{ secrets.LIGHTSAIL_HOST }}
-          username: ${{ secrets.LIGHTSAIL_USER }}
-          key: ${{ secrets.LIGHTSAIL_KEY }}
+          host: ${{ secrets.LIGHTSAIL_INSTANCE_IP }}
+          username: ubuntu
+          key: ${{ secrets.LIGHTSAIL_PRIVATE_KEY }}
           script: |
             # Remove old deployment
             sudo rm -rf /var/www/html/unma-frontend
