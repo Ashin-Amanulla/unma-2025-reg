@@ -8,7 +8,7 @@ const SponsorshipCards = ({ selectedTier, onSelectTier }) => {
   const tiers = [
     {
       name: "Title Sponsor",
-      price: "₹5,00,000",
+      // price: "₹5,00,000",
       description: "Presented by Partner - Maximum Branding Impact",
       shortDescription: "Exclusive branding rights with maximum visibility",
       benefits: [
@@ -32,7 +32,7 @@ const SponsorshipCards = ({ selectedTier, onSelectTier }) => {
     },
     {
       name: "Diamond Sponsor",
-      price: "₹3,00,000",
+      // price: "₹3,00,000",
       description:
         "Powered by - Strategic Partner - High-Impact Brand Visibility",
       shortDescription: "Strategic partnership with high-impact visibility",
@@ -55,7 +55,7 @@ const SponsorshipCards = ({ selectedTier, onSelectTier }) => {
     },
     {
       name: "Gold Sponsor",
-      price: "₹1,50,000",
+      // price: "₹1,50,000",
       description: "Support Sponsor - Strong Mid-Level Brand Positioning",
       shortDescription:
         "Strong mid-level brand positioning with comprehensive benefits",
@@ -78,7 +78,7 @@ const SponsorshipCards = ({ selectedTier, onSelectTier }) => {
     },
     {
       name: "Silver Sponsor",
-      price: "₹75,000",
+      // price: "₹75,000",
       description: "Contributing Sponsor - Standard Visibility & Engagement",
       shortDescription: "Standard visibility with essential benefits",
       benefits: [
@@ -100,7 +100,7 @@ const SponsorshipCards = ({ selectedTier, onSelectTier }) => {
     },
     {
       name: "Product Stall Sponsor",
-      price: "₹25,000",
+      // price: "₹25,000",
       description:
         "Stall-Only Promotional Opportunity - Ideal for Startups, Product Demos & Sales",
       shortDescription: "Perfect for startups and product demonstrations",
@@ -119,7 +119,7 @@ const SponsorshipCards = ({ selectedTier, onSelectTier }) => {
     },
     {
       name: "Billboard Advertisement",
-      price: "Contact Us",
+      // price: "Contact Us",
       description: "High-Impact Outdoor Advertising Opportunity",
       shortDescription:
         "Maximum visibility through strategic billboard placement",
@@ -141,7 +141,7 @@ const SponsorshipCards = ({ selectedTier, onSelectTier }) => {
     },
     {
       name: "Digital Screen Advertisement",
-      price: "Contact Us",
+      // price: "Contact Us",
       description: "Dynamic Digital Display Advertising",
       shortDescription: "Engaging digital screen presence at the venue",
       benefits: [

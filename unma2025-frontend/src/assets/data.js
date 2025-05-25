@@ -328,11 +328,12 @@ export const EVENT_PARTICIPATION_OPTIONS = [
   { value: "artCraftBooks", label: "Display art & craft or books" },
   { value: "displayCinema", label: "Display Cinema" },
   { value: "liveStreaming", label: "Live Streaming" },
+ 
+  { value: "photography", label: "Photography" },
   {
     value: "sponsorship",
     label: "Sponsorship/Advertisement (refer and earn attractive incentives)",
   },
-  { value: "photography", label: "Photography" },
   { value: "videography", label: "Videography" },
   { value: "volunteering", label: "Volunteering" },
   { value: "other", label: "Other" },

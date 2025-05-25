@@ -9,7 +9,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { Link as ScrollLink } from "react-scroll";
 import sendMail from "../api/sendMail";
-import { toast } from "react-hot-toast";
+import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import contactFormSchema from "../zod-form-validators/contactForm";
@@ -161,7 +161,7 @@ ${data.message}
                     htmlFor="phone"
                     className="block text-sm font-medium text-gray-700 mb-1"
                   >
-                    Phone Number (Optional)
+                    Phone Number
                   </label>
                   <input
                     type="tel"

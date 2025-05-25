@@ -1,21 +1,18 @@
 import React, { useState } from "react";
+import { useForm } from "react-hook-form";
 import { loadScript } from "../../utils/razorpay";
-import { toast } from "react-hot-toast";
+import { toast } from "react-toastify";
 import { usePayment } from "../../hooks/usePayment";
 
 const RegistrationType = ({ onSelectType }) => {
   const { initiatePayment } = usePayment();
   const [showContributionModal, setShowContributionModal] = useState(false);
-  const [contributionAmount, setContributionAmount] = useState("");
-  const [currency, setCurrency] = useState("INR");
-  const [isProcessing, setIsProcessing] = useState(false);
 
   const registrationTypes = [
     {
       id: "Alumni",
       title: "Alumni",
-      description:
-        "Register as a former JNV student .",
+      description: "Register as a former JNV student .",
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -36,8 +33,7 @@ const RegistrationType = ({ onSelectType }) => {
     {
       id: "Staff",
       title: "Staff",
-      description:
-        "Register as a current or former staff of JNV",
+      description: "Register as a current or former staff of JNV",
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -58,8 +54,7 @@ const RegistrationType = ({ onSelectType }) => {
     {
       id: "Other",
       title: "Other",
-      description:
-        "Register as a JNV alumni family member or as a guest",
+      description: "Register as a JNV alumni family member or as a guest",
       icon: (
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -79,171 +74,240 @@ const RegistrationType = ({ onSelectType }) => {
     },
   ];
 
-  const quickAmounts = [
-    { label: "₹1,000", value: 1000 },
-    { label: "₹2,000", value: 2000 },
-    { label: "₹5,000", value: 5000 },
-    { label: "₹10,000", value: 10000 },
-    { label: "Custom", value: "custom" },
-  ];
+  const ContributionModal = () => {
+    const [isProcessing, setIsProcessing] = useState(false);
 
-  const currencies = [
-    { code: "INR", symbol: "₹", name: "Indian Rupee" },
-    { code: "USD", symbol: "$", name: "US Dollar" },
-    { code: "EUR", symbol: "€", name: "Euro" },
-    { code: "GBP", symbol: "£", name: "British Pound" },
-  ];
+    const {
+      register,
+      handleSubmit,
+      watch,
+      reset,
+      formState: { errors },
+    } = useForm({
+      defaultValues: {
+        amount: "",
+      },
+    });
 
-  const handleAmountSelect = (value) => {
-    if (value === "custom") {
-      setContributionAmount("");
-    } else {
-      setContributionAmount(value.toString());
-    }
-  };
+    const watchedAmount = watch("amount");
 
-  const handleAnonymousContribution = async () => {
-    if (!contributionAmount || contributionAmount <= 0) {
-      toast.error("Please enter a valid amount");
-      return;
-    }
+    const onSubmitContribution = async (data) => {
+      if (!data.amount || data.amount <= 0) {
+        toast.error("Please enter a valid amount");
+        return;
+      }
 
-    setIsProcessing(true);
-    try {
-      await initiatePayment({
-        amount: parseInt(contributionAmount) * (currency === "INR" ? 1 : 100), // Convert to paise for INR, cents for others
-        name: "Anonymous",
-        email: "anonymous@example.com",
-        contact: "0000000000",
-        currency: currency,
-        notes: {
-          registrationType: "Anonymous",
-          isAttending: "No",
-        },
-        onSuccess: (response) => {
-          toast.success("Thank you for your contribution!");
-          setShowContributionModal(false);
-          setContributionAmount("");
-        },
-        onFailure: (error) => {
-          console.error("Payment failed:", error);
-          toast.error("Payment failed. Please try again.");
-        },
-      });
-    } catch (error) {
-      console.error("Payment error:", error);
-      toast.error("Something went wrong. Please try again later.");
-    } finally {
-      setIsProcessing(false);
-    }
-  };
+      setIsProcessing(true);
+      try {
+        await initiatePayment({
+          amount: parseInt(data.amount), // Amount in INR
+          name: "Anonymous",
+          email: "anonymous@example.com",
+          contact: "0000000000",
+          currency: "INR",
+          notes: {
+            registrationType: "Anonymous",
+            isAttending: "No",
+          },
+          onSuccess: (response) => {
+            toast.success("Thank you for your contribution!");
+            setShowContributionModal(false);
+            reset(); // Reset form
+          },
+          onFailure: (error) => {
+            console.error("Payment failed:", error);
+            toast.error("Payment failed. Please try again.");
+          },
+        });
+      } catch (error) {
+        console.error("Payment error:", error);
+        toast.error("Something went wrong. Please try again later.");
+      } finally {
+        setIsProcessing(false);
+      }
+    };
 
-  const ContributionModal = () => (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg p-6 max-w-md w-full">
-        <div className="flex justify-between items-center mb-4">
-          <h3 className="text-xl font-semibold">
-            Make an Anonymous Contribution
-          </h3>
-          <button
-            onClick={() => setShowContributionModal(false)}
-            className="text-gray-500 hover:text-gray-700"
-          >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div className="bg-white rounded-lg p-6 max-w-lg w-full">
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-xl font-semibold text-gray-900">
+              Make an Anonymous Contribution
+            </h3>
+            <button
+              onClick={() => setShowContributionModal(false)}
+              className="text-gray-500 hover:text-gray-700"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M6 18L18 6M6 6l12 12"
-              />
-            </svg>
-          </button>
-        </div>
-
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Select Currency
-          </label>
-          <select
-            value={currency}
-            onChange={(e) => setCurrency(e.target.value)}
-            className="w-full p-2 border rounded-md"
-          >
-            {currencies.map((curr) => (
-              <option key={curr.code} value={curr.code}>
-                {curr.name} ({curr.symbol})
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Amount
-          </label>
-          <div className="relative">
-            <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500">
-              {currencies.find((c) => c.code === currency)?.symbol}
-            </span>
-            <input
-              type="number"
-              value={contributionAmount}
-              onChange={(e) => setContributionAmount(e.target.value)}
-              className="w-full p-2 pl-8 border rounded-md"
-              placeholder="Enter amount"
-              min="1"
-            />
-          </div>
-        </div>
-
-        <div className="mb-6">
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Quick Amounts
-          </label>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-            {quickAmounts.map((amount) => (
-              <button
-                key={amount.value}
-                onClick={() => handleAmountSelect(amount.value)}
-                className={`p-2 border rounded-md text-sm ${
-                  contributionAmount === amount.value.toString()
-                    ? "bg-blue-500 text-white border-blue-500"
-                    : "hover:bg-gray-50"
-                }`}
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
               >
-                {amount.label}
-              </button>
-            ))}
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M6 18L18 6M6 6l12 12"
+                />
+              </svg>
+            </button>
           </div>
-        </div>
 
-        <div className="flex justify-end gap-3">
-          <button
-            onClick={() => setShowContributionModal(false)}
-            className="px-4 py-2 text-gray-700 hover:text-gray-900"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleAnonymousContribution}
-            disabled={isProcessing || !contributionAmount}
-            className={`px-4 py-2 rounded-md text-white ${
-              isProcessing || !contributionAmount
-                ? "bg-gray-400 cursor-not-allowed"
-                : "bg-blue-500 hover:bg-blue-600"
-            }`}
-          >
-            {isProcessing ? "Processing..." : "Contribute"}
-          </button>
+          {/* Domestic Contribution Section */}
+          <form onSubmit={handleSubmit(onSubmitContribution)} className="mb-6">
+            <h4 className="text-lg font-medium text-gray-900 mb-4">
+              Domestic Contribution (India)
+            </h4>
+
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Enter Amount (₹)
+              </label>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-500 font-medium">
+                  ₹
+                </span>
+                <input
+                  type="number"
+                  {...register("amount", {
+                    required: "Amount is required",
+                    min: {
+                      value: 1,
+                      message: "Amount must be at least ₹1",
+                    },
+                    max: {
+                      value: 1000000,
+                      message: "Amount cannot exceed ₹10,00,000",
+                    },
+                    valueAsNumber: true,
+                  })}
+                  className={`w-full p-3 pl-8 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+                    errors.amount ? "border-red-500" : "border-gray-300"
+                  }`}
+                  placeholder="Enter amount in INR"
+                  min="1"
+                  step="1"
+                  autoComplete="off"
+                />
+              </div>
+              {errors.amount && (
+                <p className="mt-1 text-sm text-red-500">
+                  {errors.amount.message}
+                </p>
+              )}
+            </div>
+
+            <button
+              type="submit"
+              disabled={isProcessing || !watchedAmount}
+              className={`w-full py-3 px-4 rounded-lg font-medium transition-all ${
+                isProcessing || !watchedAmount
+                  ? "bg-gray-400 cursor-not-allowed text-white"
+                  : "bg-blue-600 hover:bg-blue-700 text-white shadow-md hover:shadow-lg"
+              }`}
+            >
+              {isProcessing ? (
+                <div className="flex items-center justify-center">
+                  <svg
+                    className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  Processing Payment...
+                </div>
+              ) : (
+                "Proceed to Payment Gateway"
+              )}
+            </button>
+          </form>
+
+          {/* NRE Account Information */}
+          <div className="border-t pt-6">
+            <h4 className="text-lg font-semibold text-gray-900 mb-4">
+              NRE Account Details
+            </h4>
+            <div className="mb-4 p-3 bg-amber-50 border border-amber-200 rounded-lg">
+              <p className="text-sm text-amber-800 leading-snug">
+                <span className="font-medium">International Transfer:</span> Use
+                the NRE account below :
+              </p>
+            </div>
+            <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg overflow-hidden">
+              <div className="bg-blue-100 px-3 py-2 border-b border-blue-200">
+                <h5 className="font-semibold text-gray-800 text-sm leading-tight">
+                  Ciju Kurian - IDBI Bank, Tiruvalla, Kerala (689101)
+                </h5>
+              </div>
+
+              <div className="p-0">
+                <table className="w-full text-xs">
+                  <tbody>
+                    <tr className="border-b border-blue-100">
+                      <td className="py-1.5 px-3 font-medium text-gray-700 bg-blue-50 w-2/5">
+                        Account Type
+                      </td>
+                      <td className="py-1.5 px-3 text-gray-800">
+                        Savings Account
+                      </td>
+                    </tr>
+                    <tr className="border-b border-blue-100">
+                      <td className="py-1.5 px-3 font-medium text-gray-700 bg-blue-50 w-2/5">
+                        IFS Code
+                      </td>
+                      <td className="py-1.5 px-3 text-gray-800 font-mono">
+                        IBKL0000029
+                      </td>
+                    </tr>
+                    <tr className="border-b border-blue-100">
+                      <td className="py-1.5 px-3 font-medium text-gray-700 bg-blue-50 w-2/5">
+                        Swift Code
+                      </td>
+                      <td className="py-1.5 px-3 text-gray-800 font-mono">
+                        IBKLINBB737
+                      </td>
+                    </tr>
+                    <tr>
+                      <td className="py-1.5 px-3 font-medium text-gray-700 bg-blue-50 w-2/5">
+                        NRE Account No.
+                      </td>
+                      <td className="py-1.5 px-3 text-gray-800 font-mono font-semibold">
+                        0029104000114851
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-end mt-6">
+            <button
+              onClick={() => setShowContributionModal(false)}
+              className="px-4 py-2 text-gray-600 hover:text-gray-800 font-medium"
+            >
+              Close
+            </button>
+          </div>
         </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   return (
     <div>
@@ -252,7 +316,8 @@ const RegistrationType = ({ onSelectType }) => {
           Select Your Connection to JNV
         </h2>
         <p className="text-gray-600 mt-2">
-          Please select how you are connected to JNV for the UNMA SUMMIT 2025 event
+          Please select how you are connected to JNV for the UNMA SUMMIT 2025
+          event
         </p>
       </div>
 
@@ -298,7 +363,7 @@ const RegistrationType = ({ onSelectType }) => {
               d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
             />
           </svg>
-          Contribute 
+          Contribute
         </button>
         <p className="mt-2 text-sm text-gray-500">
           Make a contribution without registering

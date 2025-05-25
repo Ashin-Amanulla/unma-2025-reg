@@ -80,7 +80,7 @@ const CountdownTimer = () => {
   });
 
   useEffect(() => {
-    const targetDate = new Date("2025-08-15T09:00:00");
+    const targetDate = new Date("2025-08-30T09:00:00");
 
     const calculateTimeLeft = () => {
       const now = new Date();
@@ -241,10 +241,11 @@ const Home = () => {
                   </span>
                 </h1>
                 <p className="text-xl text-white/80 leading-relaxed max-w-3xl mx-auto">
-                  Let’s have a memorable gathering of Jawahar Navodaya Vidyalaya
-                  Alumni and Staff from 14 districts of Kerala, Mahe, Lakshadweep, and
-                  other  JNV’s Alumni/Staff  residing in Kerala. Reconnect with school
-                  friends and staff, share stories, and create new memories.
+                  Let's have a memorable gathering of Jawahar Navodaya Vidyalaya
+                  Alumni and Staff from 14 districts of Kerala, Mahe,
+                  Lakshadweep, and other JNV's Alumni/Staff residing in Kerala.
+                  Reconnect with school friends and staff, share stories, and
+                  create new memories.
                 </p>
               </motion.div>
 
@@ -616,10 +617,9 @@ const Home = () => {
                             Who Can Attend
                           </h4>
                           <p className="text-gray-800 font-medium">
-                          Alumni and Staff from JNVs of Kerala, Mahe and Lakshadweep and other JNV’s alumni /staff residing in Kerala.
-                          </p>
-                          <p className="text-gray-600">
-                            Family members are welcome to join
+                            Alumni and Staff from JNVs of Kerala, Mahe and
+                            Lakshadweep and other JNV's alumni /staff residing
+                            in Kerala. Family members are welcome to join.
                           </p>
                         </div>
                       </div>
@@ -751,9 +751,24 @@ const Home = () => {
             <div className="max-w-3xl mx-auto">
               {[
                 {
+                  question: "How to report an Issue on Registration?",
+                  answer: (
+                    <>
+                      Kindly use the{" "}
+                      <Link
+                        to="/report-issue"
+                        className="text-primary hover:text-primary-dark underline"
+                      >
+                        report issue page
+                      </Link>{" "}
+                      in the registration page .
+                    </>
+                  ),
+                },
+                {
                   question: "Who can attend the UNMA 2025 event?",
                   answer:
-                    "The event is open to all Alumni and Staff from JNVs of Kerala, Mahe and Lakshadweep and other JNV’s alumni /staff residing in Kerala. You can also bring your immediate family members along.",
+                    "The event is open to all Alumni and Staff from JNVs of Kerala, Mahe and Lakshadweep and other JNV's alumni /staff residing in Kerala. You can also bring your immediate family members along.",
                 },
                 {
                   question: "How can I register for the event?",
@@ -763,18 +778,34 @@ const Home = () => {
                 {
                   question: "Is there a registration fee?",
                   answer:
-                    "A nominal amount of Registration fee will be charged based on head count.",
+                    "A nominal registration fee will be charged per person. However, as this is a fundraiser for UNMA's future activities, we encourage you to contribute according to your capacity.",
                 },
+
                 {
                   question:
-                    "What if I'm from JNV Malappuram, Thrissur, or Alappuzha?",
+                    "What if I'm from JNV  Alappuzha, Malappuram or Thrissur?",
                   answer:
-                    "Alumni from these schools are advised to contact their respective alumni associations for their separate registration processes.",
+                    "Alumni from these schools are advised to contact their respective alumni associations for their separate registration process.",
                 },
                 {
                   question: "Will accommodation be arranged?",
                   answer:
                     "Yes, we will connect you with accommodation options near the venue. You can specify your requirements during registration.",
+                },
+                {
+                  question: "How do I submit a suggestion ?",
+                  answer: (
+                    <>
+                      Kindly use the{" "}
+                      <Link
+                        to="/contact"
+                        className="text-primary hover:text-primary-dark underline"
+                      >
+                        message box
+                      </Link>{" "}
+                      in the contact page .
+                    </>
+                  ),
                 },
               ].map((item, index) => (
                 <motion.div

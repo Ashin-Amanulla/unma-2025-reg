@@ -365,8 +365,9 @@ export const sendOtp = async (req, res) => {
         const existingRegistration = await Registration.findOne({
             $or: [{ email }, { contactNumber }]
         });
+        console.log("existingRegistration", existingRegistration);
 
-        if (existingRegistration.paymentStatus === 'Completed') {
+        if (existingRegistration && existingRegistration.paymentStatus === 'Completed') {
             return res.status(400).json({
                 status: 'error',
                 message: 'Your registration was successful, should you need to modify your registration data, kindly wait for the release for update form.'

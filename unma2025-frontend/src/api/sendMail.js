@@ -4,7 +4,7 @@ const sendMail = async (email, subject, message) => {
   try {
     const response = await axios.post('/registrations/send-message', {
       email,
-      subject: 'UNMA 2025 Reunion-Message from ' + name,
+      subject,
       message,
     });
     return response.data;
