@@ -12,11 +12,13 @@ const registrationsApi = {
      */
     create: async (registrationId, payload) => {
         try {
-            console.log(`API call to /registrations/step/${registrationId || 'new'}`, payload);
             const response = await axios.post(`/registrations/step/${registrationId || 'new'}`, payload);
+            console.log("API response:", response);
+            
             return response.data;
         } catch (error) {
             console.error("Registration API error:", error);
+          
             if (error.response?.data) {
                 throw error.response.data;
             } else if (error.message) {
@@ -27,6 +29,15 @@ const registrationsApi = {
         }
     },
 
+
+    submitWithoutPayment: async (registrationId, payload) => {
+        try {
+            const response = await axios.post(`/registrations/step/${registrationId || 'new'}`, payload);
+            return response.data;
+        } catch (error) {
+            throw error.response?.data || { message: 'Failed to submit without payment' };
+        }
+    },
     /**
      * Verify OTP for registration
      * @param {string} email - User email
@@ -137,7 +148,7 @@ const registrationsApi = {
 
     transactionRegister: async (registrationId, payload) => {
         try {
-            const response = await axios.post(`/registrations/${registrationId}/payment`, payload);
+            const response = await axios.post(`/registrations/transaction/${registrationId}`, payload);
             return response.data;
         } catch (error) {
             throw error.response?.data || { message: 'Failed to register transaction' };

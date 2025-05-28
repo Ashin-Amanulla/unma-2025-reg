@@ -3,7 +3,8 @@ import { useForm } from "react-hook-form";
 import { loadScript } from "../../utils/razorpay";
 import { toast } from "react-toastify";
 import { usePayment } from "../../hooks/usePayment";
-
+import registrationsApi from "../../api/registrationsApi";
+import { v4 as uuidv4 } from 'uuid';
 const RegistrationType = ({ onSelectType }) => {
   const { initiatePayment } = usePayment();
   const [showContributionModal, setShowContributionModal] = useState(false);
@@ -109,7 +110,25 @@ const RegistrationType = ({ onSelectType }) => {
             registrationType: "Anonymous",
             isAttending: "No",
           },
-          onSuccess: (response) => {
+          onSuccess: async (response) => {
+              const registrationId = uuidv4();
+            let payload = {
+              amount: parseInt(data.amount),
+              name: "Anonymous",
+              email: "anonymous@example.com",
+              contact: "0000000000",
+              currency: "INR",
+              paymentMethod: "razorpay",
+              paymentGatewayResponse: response,
+              purpose: "contribution",
+            };    
+            try { 
+              await registrationsApi.transactionRegister(registrationId, payload);
+            } catch (error) {
+              console.error("Transaction registration failed:", error);
+              toast.error("Transaction registration failed. Please try again later.");
+            }
+
             toast.success("Thank you for your contribution!");
             setShowContributionModal(false);
             reset(); // Reset form

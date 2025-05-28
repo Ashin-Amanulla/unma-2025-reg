@@ -165,8 +165,10 @@ const AlumniRegistrationForm = ({ onBack, storageKey }) => {
       canReferSponsorship: false,
 
       // Transportation
-      planTravel: false,
       travelConsistsTwoSegments: "",
+      connectWithNavodayansFirstSegment: "",
+      firstSegmentStartingLocation: "",
+      firstSegmentTravelDate: "",
       startingLocation: "",
       startPincode: "",
       pinDistrict: "",
@@ -176,10 +178,10 @@ const AlumniRegistrationForm = ({ onBack, storageKey }) => {
       travelDate: "",
       travelTime: "",
       modeOfTransport: "",
-      connectWithNavodayans: "",
-      vehicleCapacity: 1,
       needParking: "",
+      connectWithNavodayans: "",
       readyForRideShare: "",
+      vehicleCapacity: 1,
       groupSize: 1,
       travelSpecialRequirements: "",
 
@@ -187,17 +189,27 @@ const AlumniRegistrationForm = ({ onBack, storageKey }) => {
       planAccommodation: false,
       accommodation: "",
       accommodationGender: "",
-      accommodationNeeded: { male: 0, female: 0 },
+      accommodationNeeded: { male: 0, female: 0, other: 0 },
       accommodationPincode: "",
       accommodationDistrict: "",
       accommodationState: "",
       accommodationTaluk: "",
-      accommodationSubPostOffice: "",
       accommodationLandmark: "",
+      accommodationSubPostOffice: "",
       accommodationArea: "",
       accommodationCapacity: 0,
       accommodationLocation: "",
       accommodationRemarks: "",
+      // Hotel specific fields
+      hotelRequirements: {
+        adults: 0,
+        childrenAbove11: 0,
+        children5to11: 0,
+        checkInDate: "",
+        checkOutDate: "",
+        roomPreference: "",
+        specialRequests: "",
+      },
 
       // Financial
       willContribute: false,
@@ -405,7 +417,6 @@ const AlumniRegistrationForm = ({ onBack, storageKey }) => {
 
         // Check if stateUT is actually selected
         const currentState = watch("stateUT");
-        console.log("Current state:", currentState);
 
         if (!currentState || currentState === "") {
           toast.error("Please select your current State/UT of residence");
@@ -418,7 +429,6 @@ const AlumniRegistrationForm = ({ onBack, storageKey }) => {
 
           // Check if district is actually selected
           const currentDistrict = watch("district");
-          console.log("Current district:", currentDistrict);
 
           if (!currentDistrict || currentDistrict === "") {
             toast.error("Please select your current district of residence");
@@ -545,6 +555,30 @@ const AlumniRegistrationForm = ({ onBack, storageKey }) => {
           fieldsToValidate.push("accommodationArea");
         }
       }
+
+      if (accommodation === "discount-hotel") {
+        fieldsToValidate.push(
+          "hotelRequirements.adults",
+          "hotelRequirements.checkInDate",
+          "hotelRequirements.checkOutDate",
+          "hotelRequirements.roomPreference"
+        );
+
+        // Validate that adults count is at least 1
+        const adults = watch("hotelRequirements.adults");
+        if (!adults || adults < 1) {
+          toast.error("Please specify at least 1 adult for hotel booking");
+          return false;
+        }
+
+        // Validate check-out date is after check-in date
+        const checkInDate = watch("hotelRequirements.checkInDate");
+        const checkOutDate = watch("hotelRequirements.checkOutDate");
+        if (checkInDate && checkOutDate && checkOutDate <= checkInDate) {
+          toast.error("Check-out date must be after check-in date");
+          return false;
+        }
+      }
     } else if (currentStep === 7) {
       // Optional fields - no required validation
       return true;
@@ -645,16 +679,13 @@ const AlumniRegistrationForm = ({ onBack, storageKey }) => {
       // For first step after verification, always create a new registration
       const idToUse = stepNumber === 1 ? "new" : registrationId || "new";
       console.log(`Saving step ${stepNumber} with ID:`, idToUse);
-
       const payload = {
         step: stepNumber,
         stepData,
         verificationToken,
       };
-
       // Send data to backend API
       const response = await registrationsApi.create(idToUse, payload);
-
       console.log("API response:", response);
 
       // Update registration ID if this is a new registration
@@ -755,24 +786,25 @@ const AlumniRegistrationForm = ({ onBack, storageKey }) => {
           sponsorshipDetails: formData.sponsorshipDetails,
         },
         transportation: {
-          planTravel: formData.planTravel,
           travelConsistsTwoSegments: formData.travelConsistsTwoSegments,
+          connectWithNavodayansFirstSegment:
+            formData.connectWithNavodayansFirstSegment,
+          firstSegmentStartingLocation: formData.firstSegmentStartingLocation,
+          firstSegmentTravelDate: formData.firstSegmentTravelDate,
           startingLocation: formData.startingLocation,
           startPincode: formData.startPincode,
           pinDistrict: formData.pinDistrict,
           pinState: formData.pinState,
           pinTaluk: formData.pinTaluk,
-          subPostOffice: formData.subPostOffice,
-          originArea: formData.originArea,
           nearestLandmark: formData.nearestLandmark,
           travelDate: formData.travelDate,
           travelTime: formData.travelTime,
           modeOfTransport: formData.modeOfTransport,
-          readyForRideShare: formData.readyForRideShare,
-          rideShareCapacity: formData.rideShareCapacity,
           needParking: formData.needParking,
-          wantRideShare: formData.wantRideShare,
-          rideShareGroupSize: formData.rideShareGroupSize,
+          connectWithNavodayans: formData.connectWithNavodayans,
+          readyForRideShare: formData.readyForRideShare,
+          vehicleCapacity: formData.vehicleCapacity,
+          groupSize: formData.groupSize,
           travelSpecialRequirements: formData.travelSpecialRequirements,
         },
         accommodation: {
@@ -780,9 +812,6 @@ const AlumniRegistrationForm = ({ onBack, storageKey }) => {
           accommodation: formData.accommodation,
           accommodationGender: formData.accommodationGender,
           accommodationNeeded: formData.accommodationNeeded,
-          accommodationCapacity: formData.accommodationCapacity,
-          accommodationLocation: formData.accommodationLocation,
-          accommodationRemarks: formData.accommodationRemarks,
           accommodationPincode: formData.accommodationPincode,
           accommodationDistrict: formData.accommodationDistrict,
           accommodationState: formData.accommodationState,
@@ -790,6 +819,10 @@ const AlumniRegistrationForm = ({ onBack, storageKey }) => {
           accommodationLandmark: formData.accommodationLandmark,
           accommodationSubPostOffice: formData.accommodationSubPostOffice,
           accommodationArea: formData.accommodationArea,
+          accommodationCapacity: formData.accommodationCapacity,
+          accommodationLocation: formData.accommodationLocation,
+          accommodationRemarks: formData.accommodationRemarks,
+          hotelRequirements: formData.hotelRequirements,
         },
         optional: {
           spouseNavodayan: formData.spouseNavodayan,
@@ -892,7 +925,7 @@ const AlumniRegistrationForm = ({ onBack, storageKey }) => {
 
       // Save final step
       const saveSuccess = await saveStepToBackend(currentStep, data);
-
+      console.log("saveSuccess", saveSuccess);
       if (!saveSuccess) {
         setIsSubmitting(false);
         return;
@@ -905,13 +938,21 @@ const AlumniRegistrationForm = ({ onBack, storageKey }) => {
       localStorage.removeItem(`${storageKey}-token`);
       localStorage.removeItem(`${storageKey}-id`);
 
-      // Show success message
-      toast.success("🎉 Registration completed successfully!");
-
-      // Use direct window location change for reliable redirect
-      setTimeout(() => {
-        window.location.href = "/registration-success";
-      }, 1000); // Small delay to ensure toast is visible
+      // Show success message based on registration status
+      if (data.registrationStatus === "incomplete") {
+        toast.info("Registration submitted for review");
+        navigate("/registration-pending", {
+          state: {
+            school: watch("school"),
+            name: watch("name"),
+            email: watch("email"),
+            contactNumber: watch("contactNumber"),
+          },
+        });
+      } else {
+        toast.success("🎉 Registration completed successfully!");
+        navigate("/registration-success");
+      }
     } catch (error) {
       console.error("Registration error:", error);
       toast.error("Registration submission failed. Please try again.");
@@ -921,7 +962,10 @@ const AlumniRegistrationForm = ({ onBack, storageKey }) => {
 
   // Fix the handleSubmitForm function
   const handleSubmitForm = async () => {
-    if (!hasPreviousContribution) {
+    if (
+      !hasPreviousContribution &&
+      watch("paymentStatus") !== "financial-difficulty"
+    ) {
       toast.error(
         "Please complete your contribution payment before submitting"
       );
@@ -932,7 +976,6 @@ const AlumniRegistrationForm = ({ onBack, storageKey }) => {
       // Get form data
       const formData = getValues();
       console.log("Submitting form with data:", formData);
-
       // Directly call onSubmit with form data
       await onSubmit(formData);
     } catch (error) {
@@ -956,6 +999,7 @@ const AlumniRegistrationForm = ({ onBack, storageKey }) => {
       name: watch("name"),
       email: watch("email"),
       contact: watch("contactNumber"),
+      currency: "INR",
       notes: {
         registrationType: "Alumni",
         isAttending: isAttending ? "Yes" : "No",
@@ -965,6 +1009,10 @@ const AlumniRegistrationForm = ({ onBack, storageKey }) => {
         // Process payment confirmation with backend
         let payload = {
           amount: contributionAmount,
+          name: watch("name"),
+          email: watch("email"),
+          contact: watch("contactNumber"),
+
           paymentMethod: "razorpay",
           paymentGatewayResponse: response,
           purpose: "registration",
@@ -1047,6 +1095,9 @@ const AlumniRegistrationForm = ({ onBack, storageKey }) => {
       // Skip expense comparison for additional contributions
       if (!hasPreviousContribution) {
         const attendees = watch("attendees");
+        const yearOfPassing = parseInt(watch("yearOfPassing"));
+        const isRecentGraduate = yearOfPassing >= 2022 && yearOfPassing <= 2025;
+
         const adultCount =
           (attendees?.adults?.veg || 0) + (attendees?.adults?.nonVeg || 0);
         const teenCount =
@@ -1054,8 +1105,9 @@ const AlumniRegistrationForm = ({ onBack, storageKey }) => {
         const childCount =
           (attendees?.children?.veg || 0) + (attendees?.children?.nonVeg || 0);
 
-        const totalExpense =
-          adultCount * 500 + teenCount * 350 + childCount * 150;
+        const totalExpense = isRecentGraduate
+          ? adultCount * 350 + teenCount * 350 + childCount * 350
+          : adultCount * 500 + teenCount * 350 + childCount * 350;
         setValue("proposedAmount", totalExpense);
 
         if (
@@ -1419,15 +1471,23 @@ const AlumniRegistrationForm = ({ onBack, storageKey }) => {
               errors={errors}
               required={true}
               options={countryOptions}
-              onChange={(value) => {
-                setValue("country", value);
-                if (value !== "IN") {
+              onChange={(selectedOption) => {
+                const countryValue = selectedOption?.value || "";
+
+                // Update country value
+                setValue("country", countryValue);
+
+                // If country is not India, clear state and district
+                if (countryValue !== "IN") {
                   setValue("stateUT", null);
                   setValue("district", null);
-                  // Also trigger validation for the cleared fields
-                  trigger(["stateUT", "district"]);
+
+                  // Force form to recognize these fields have been changed
+                  trigger(["country", "stateUT", "district"]);
+                } else {
+                  // If switching back to India, just trigger country validation
+                  trigger("country");
                 }
-                trigger("country");
               }}
               placeholder="Select your country"
               isSearchable={true}
@@ -1681,49 +1741,48 @@ const AlumniRegistrationForm = ({ onBack, storageKey }) => {
         {currentStep === 5 && isAttending && (
           <FormSection title="Transportation Details">
             <div className="space-y-6">
+              {/* Section 1: Two Segments Travel */}
               <div className="flex items-start mb-4">
                 <div className="flex items-center h-5">
                   <input
-                    id="planTravel"
+                    id="travelConsistsTwoSegments"
                     type="checkbox"
                     className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                    checked={watch("planTravel")}
-                    onChange={(e) => setValue("planTravel", e.target.checked)}
+                    checked={watch("travelConsistsTwoSegments") === "yes"}
+                    onChange={(e) =>
+                      setValue(
+                        "travelConsistsTwoSegments",
+                        e.target.checked ? "yes" : "no"
+                      )
+                    }
                   />
                 </div>
                 <div className="ml-3 text-sm">
                   <label
-                    htmlFor="planTravel"
+                    htmlFor="travelConsistsTwoSegments"
                     className="font-medium text-gray-900"
                   >
-                    Plan your travel for UNMA Meet 2025
+                    Does your travel consist of 2 segments:
                   </label>
-                  <div className="bg-blue-50 p-4 rounded-lg mb-6">
-                    <p className="text-blue-800 text-sm">
-                      This information will help us organize group
-                      transportation and ride sharing from your area. Both those
-                      who can offer ride sharing, and those in need of it are
-                      encouraged to fill these details. Later, you will have
-                      opportunity to update the changes, if any, in your plan.
-                      Also, we will coordinate special bookings based on the
-                      number of alumni from each area.
-                    </p>
-                  </div>
+                  <p className="text-gray-500">
+                    (First from the city you are travelling to Kerala and second
+                    from a town in Kerala to the venue)
+                  </p>
                 </div>
               </div>
 
-              {watch("planTravel") && (
+              {/* Fields that appear only if two segments is checked */}
+              {watch("travelConsistsTwoSegments") === "yes" && (
                 <motion.div
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: "auto" }}
                   exit={{ opacity: 0, height: 0 }}
                   transition={{ duration: 0.3 }}
-                  className="space-y-6"
+                  className="space-y-4 pl-4 border-l-2 border-blue-200"
                 >
-                  {/* Question 1: Does your travel consist of 2 segments? */}
                   <FormField
-                    label="Does your travel consist of 2 segments? (one from the city you are travelling to Kerala, second from a town in Kerala to the venue)"
-                    name="travelConsistsTwoSegments"
+                    label="Would you like to connect with other Navodayans from your starting point for better planning?"
+                    name="connectWithNavodayansFirstSegment"
                     type="select"
                     control={control}
                     errors={errors}
@@ -1733,20 +1792,164 @@ const AlumniRegistrationForm = ({ onBack, storageKey }) => {
                     ]}
                   />
 
-                  {/* Question 2: Starting Location */}
+                  <FormField
+                    label="Starting Location"
+                    name="firstSegmentStartingLocation"
+                    type="text"
+                    control={control}
+                    errors={errors}
+                    placeholder="Enter city/town name (use official names)"
+                  />
+
+                  <FormField
+                    label="Expected Travel Date"
+                    name="firstSegmentTravelDate"
+                    type="date"
+                    control={control}
+                    errors={errors}
+                    min={new Date().toISOString().split("T")[0]}
+                    className="date-picker"
+                  />
+                </motion.div>
+              )}
+
+              {/* Section 2: Transportation to Venue */}
+              <div className="mt-8">
+                <h3 className="text-lg font-medium text-gray-900 mb-4">
+                  Transportation to Venue
+                </h3>
+                <div className="space-y-4">
                   <FormField
                     label="Starting Location"
                     name="startingLocation"
                     type="text"
                     control={control}
                     errors={errors}
-                    placeholder="Enter city/town name (use official names)"
-                    helperText="Please use official names of the location for better coordination"
+                    placeholder="Enter your starting location"
                   />
 
-                  {/* Question 3: Expected Travel Date */}
                   <FormField
-                    label="Expected Travel Date"
+                    label="Mode of Transport"
+                    name="modeOfTransport"
+                    type="select"
+                    control={control}
+                    errors={errors}
+                    options={[
+                      { value: "boat", label: "Boat/Ship" },
+                      { value: "bus", label: "Bus" },
+                      { value: "car", label: "Car" },
+                      { value: "flight", label: "Flight" },
+                      {
+                        value: "looking-for-transport",
+                        label: "I am looking for a transportation/lift",
+                      },
+                      { value: "other", label: "Other" },
+                      { value: "train", label: "Train" },
+                      { value: "two-wheeler", label: "Two Wheeler" },
+                    ]}
+                  />
+
+                  <FormField
+                    label="Starting Location Pincode"
+                    name="startPincode"
+                    type="text"
+                    control={control}
+                    errors={errors}
+                    placeholder="Enter your starting location pincode"
+                    pattern="[0-9]{6}"
+                    maxLength={6}
+                    onChange={async (e) => {
+                      const pincodeValue = e.target.value;
+                      if (pincodeValue.length === 6) {
+                        try {
+                          toast.info("Fetching location details...", {
+                            autoClose: false,
+                            closeButton: false,
+                            isLoading: true,
+                          });
+
+                          const data = await getPincodeDetails(pincodeValue);
+
+                          if (
+                            data &&
+                            data[0] &&
+                            data[0].Status === "Success" &&
+                            data[0].PostOffice &&
+                            data[0].PostOffice.length > 0
+                          ) {
+                            const postOffice = data[0].PostOffice[0];
+                            setValue("pinDistrict", postOffice.District);
+                            setValue("pinState", postOffice.State);
+                            setValue(
+                              "pinTaluk",
+                              postOffice.Block || postOffice.District
+                            );
+                            toast.dismiss();
+                            toast.success(
+                              `Location found: ${postOffice.District}, ${postOffice.State}`
+                            );
+                          } else {
+                            setValue("pinDistrict", "");
+                            setValue("pinState", "");
+                            setValue("pinTaluk", "");
+                            toast.dismiss();
+                            toast.error(
+                              "Invalid pincode or location not found"
+                            );
+                          }
+                        } catch (error) {
+                          setValue("pinDistrict", "");
+                          setValue("pinState", "");
+                          setValue("pinTaluk", "");
+                          toast.dismiss();
+                          toast.error(
+                            "Error fetching location details. Please try again."
+                          );
+                        }
+                      }
+                    }}
+                  />
+
+                  {/* Display location details if pincode is valid */}
+                  {watch("startPincode")?.length === 6 && (
+                    <div className="bg-gray-50 p-4 rounded-lg">
+                      <h4 className="text-sm font-medium text-gray-700 mb-2">
+                        Location Details
+                      </h4>
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div>
+                          <p className="text-sm text-gray-500">District</p>
+                          <p className="text-sm font-medium">
+                            {watch("pinDistrict") || "Not found"}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-500">Taluk/Block</p>
+                          <p className="text-sm font-medium">
+                            {watch("pinTaluk") || "Not found"}
+                          </p>
+                        </div>
+                        <div>
+                          <p className="text-sm text-gray-500">State</p>
+                          <p className="text-sm font-medium">
+                            {watch("pinState") || "Not found"}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  <FormField
+                    label="Nearest Landmark"
+                    name="nearestLandmark"
+                    type="text"
+                    control={control}
+                    errors={errors}
+                    placeholder="e.g., Railway Station, Bus Stand, etc."
+                  />
+
+                  <FormField
+                    label="Travel Date"
                     name="travelDate"
                     type="date"
                     control={control}
@@ -1755,30 +1958,23 @@ const AlumniRegistrationForm = ({ onBack, storageKey }) => {
                     className="date-picker"
                   />
 
-                  {/* Question 4: Would you like to connect with other Navodayans */}
                   <FormField
-                    label="Would you like to connect with other Navodayans from your starting point for better planning?"
-                    name="connectWithNavodayans"
-                    type="select"
+                    label="Start Time"
+                    name="travelTime"
+                    type="time"
                     control={control}
                     errors={errors}
-                    options={[
-                      { value: "yes", label: "Yes" },
-                      { value: "no", label: "No" },
-                    ]}
+                    className="time-picker"
                   />
 
-                  {/* Transportation to Venue Section */}
-                  <div className="bg-gray-50 p-6 rounded-lg">
-                    <h3 className="text-lg font-medium text-gray-900 mb-4">
-                      Transportation to Venue
-                    </h3>
-
-                    {/* Question 5: Would you like to connect with other Navodayans for car pooling */}
-                    <div className="space-y-4">
+                  {/* Parking and ride sharing options for vehicles */}
+                  {["car", "two-wheeler", "bus"].includes(
+                    watch("modeOfTransport")
+                  ) && (
+                    <>
                       <FormField
-                        label="Would you like to connect with other Navodayans from your starting point for better planning or for car pooling/sharing?"
-                        name="readyForRideShare"
+                        label="Will you need parking at the venue?"
+                        name="needParking"
                         type="select"
                         control={control}
                         errors={errors}
@@ -1788,292 +1984,73 @@ const AlumniRegistrationForm = ({ onBack, storageKey }) => {
                         ]}
                       />
 
-                      {/* Question 6: Starting location pincode */}
                       <FormField
-                        label="Starting Location Pincode"
-                        name="startPincode"
-                        type="text"
-                        control={control}
-                        errors={errors}
-                        placeholder="Enter your starting location pincode"
-                        pattern="[0-9]{6}"
-                        maxLength={6}
-                        onChange={async (e) => {
-                          const pincodeValue = e.target.value;
-                          if (pincodeValue.length === 6) {
-                            try {
-                              // Show loading state
-                              toast.info("Fetching location details...", {
-                                autoClose: false,
-                                closeButton: false,
-                                isLoading: true,
-                              });
-
-                              const data = await getPincodeDetails(
-                                pincodeValue
-                              );
-
-                              if (
-                                data &&
-                                data[0] &&
-                                data[0].Status === "Success" &&
-                                data[0].PostOffice &&
-                                data[0].PostOffice.length > 0
-                              ) {
-                                const postOffice = data[0].PostOffice[0];
-
-                                setValue("pinDistrict", postOffice.District);
-                                setValue("pinState", postOffice.State);
-                                setValue(
-                                  "pinTaluk",
-                                  postOffice.Block || postOffice.District
-                                );
-
-                                // Show success message with location details
-                                toast.dismiss();
-                                toast.success(
-                                  `Location found: ${postOffice.District}, ${postOffice.State}`
-                                );
-                              } else {
-                                // Clear the values if pincode is invalid
-                                setValue("pinDistrict", "");
-                                setValue("pinState", "");
-                                setValue("pinTaluk", "");
-                                toast.dismiss();
-                                toast.error(
-                                  "Invalid pincode or location not found"
-                                );
-                              }
-                            } catch (error) {
-                              // Clear the values if there's an error
-                              setValue("pinDistrict", "");
-                              setValue("pinState", "");
-                              setValue("pinTaluk", "");
-                              toast.dismiss();
-                              toast.error(
-                                "Error fetching location details. Please try again."
-                              );
-                            }
-                          } else {
-                            // Clear the values if pincode is not 6 digits
-                            setValue("pinDistrict", "");
-                            setValue("pinState", "");
-                            setValue("pinTaluk", "");
-                          }
-                        }}
-                      />
-
-                      {/* Question 7: Mode of Transport */}
-                      <FormField
-                        label="Mode of Transport"
-                        name="modeOfTransport"
+                        label="Would you like to connect with other Navodayans for better planning or carpooling arrangements?"
+                        name="connectWithNavodayans"
                         type="select"
                         control={control}
                         errors={errors}
                         options={[
-                          { value: "bus", label: "Bus" },
-                          { value: "boat", label: "Boat/Ship" },
-                          { value: "car", label: "Car" },
-                          { value: "flight", label: "Flight" },
-                          { value: "train", label: "Train" },
-                          { value: "two-wheeler", label: "Two Wheeler" },
-                          {
-                            value: "sharing",
-                            label: "Looking for Shared Transportation/Lift",
-                          },
-                          { value: "other", label: "Other" },
+                          { value: "yes", label: "Yes" },
+                          { value: "no", label: "No" },
                         ]}
                       />
 
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <FormField
-                          label="Nearest Landmark"
-                          name="nearestLandmark"
-                          type="text"
-                          control={control}
-                          errors={errors}
-                          placeholder="e.g., Railway Station, Bus Stand, etc."
-                        />
-
-                        <FormField
-                          label="Start Time"
-                          name="travelTime"
-                          type="time"
-                          control={control}
-                          errors={errors}
-                          className="time-picker"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Display location details if pincode is valid */}
-                  {watch("startPincode")?.length === 6 && (
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <h4 className="text-sm font-medium text-gray-700 mb-2">
-                        Location Details
-                      </h4>
-                      {watch("pinDistrict") && watch("pinState") ? (
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                          <div>
-                            <p className="text-sm text-gray-500">District</p>
-                            <p className="text-sm font-medium">
-                              {watch("pinDistrict")}
-                            </p>
-                          </div>
-                          <div>
-                            <p className="text-sm text-gray-500">Taluk/Block</p>
-                            <p className="text-sm font-medium">
-                              {watch("pinTaluk")}
-                            </p>
-                          </div>
-                          <div>
-                            <p className="text-sm text-gray-500">State</p>
-                            <p className="text-sm font-medium">
-                              {watch("pinState")}
-                            </p>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="space-y-4">
-                          <p className="text-sm text-red-600">
-                            Invalid pincode or location not found
-                          </p>
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Additional questions based on transport mode and ride sharing preference */}
-                  <div className="space-y-4">
-                    {/* Question 8: For those who have their own vehicle */}
-                    {(watch("modeOfTransport") === "car" ||
-                      watch("modeOfTransport") === "two-wheeler") && (
-                      <div className="space-y-4">
-                        <FormField
-                          label="Will you need parking at venue?"
-                          name="needParking"
-                          type="select"
-                          control={control}
-                          errors={errors}
-                          options={[
-                            { value: "yes", label: "Yes" },
-                            { value: "no", label: "No" },
-                          ]}
-                        />
-
-                        {watch("readyForRideShare") === "yes" && (
+                      {watch("connectWithNavodayans") === "yes" && (
+                        <>
                           <FormField
-                            label="How many people can you accommodate in your vehicle (Car/Two wheeler)?"
-                            name="vehicleCapacity"
-                            type="number"
+                            label="Will you be ready for ride sharing with fellow Navodayans from your area?"
+                            name="readyForRideShare"
+                            type="select"
                             control={control}
                             errors={errors}
-                            min={1}
-                            max={6}
-                            helperText="Including yourself, how many total people can travel in your vehicle?"
+                            options={[
+                              { value: "yes", label: "Yes" },
+                              { value: "no", label: "No" },
+                            ]}
                           />
-                        )}
-                      </div>
-                    )}
 
-                    {/* Question 9: For those looking for shared transportation */}
-                    {watch("modeOfTransport") === "sharing" && (
-                      <div className="bg-blue-50 p-4 rounded-lg">
-                        <h4 className="text-sm font-medium text-blue-800 mb-2">
-                          Looking for Shared Transportation
-                        </h4>
-                        <p className="text-blue-700 text-sm mb-4">
-                          You've indicated you're looking for shared
-                          transportation. We'll connect you with other alumni
-                          who can provide rides from your area.
-                        </p>
-                        <FormField
-                          label="How many people along with you (including you) who needs transportation to venue?"
-                          name="groupSize"
-                          type="number"
-                          control={control}
-                          errors={errors}
-                          min={1}
-                          max={10}
-                          helperText="Total number of people in your group who need transportation"
-                        />
-                      </div>
-                    )}
-
-                    {/* Question 16: For other transport modes */}
-                    {watch("modeOfTransport") &&
-                      !["car", "two-wheeler", "sharing"].includes(
-                        watch("modeOfTransport")
-                      ) && (
-                        <FormField
-                          label="How many people along with you (including you) who needs transportation to venue?"
-                          name="groupSize"
-                          type="number"
-                          control={control}
-                          errors={errors}
-                          min={1}
-                          max={10}
-                          helperText="Total number of people in your group"
-                        />
+                          {watch("readyForRideShare") === "yes" && (
+                            <FormField
+                              label="How many people can you accommodate in your vehicle?"
+                              name="vehicleCapacity"
+                              type="number"
+                              control={control}
+                              errors={errors}
+                              min={1}
+                              max={10}
+                              helperText="Including yourself, total number of people (gender doesn't matter, Navodayans will adjust)"
+                            />
+                          )}
+                        </>
                       )}
-                  </div>
+                    </>
+                  )}
+
+                  {/* Fields for those looking for transportation */}
+                  {watch("modeOfTransport") === "looking-for-transport" && (
+                    <FormField
+                      label="How many people including you who needs transportation to venue?"
+                      name="groupSize"
+                      type="number"
+                      control={control}
+                      errors={errors}
+                      min={1}
+                      max={10}
+                      helperText="Total number of people in your group who need transportation"
+                    />
+                  )}
 
                   <FormField
-                    label="Special Requirements for Travel"
+                    label="Special Requirements"
                     name="travelSpecialRequirements"
                     type="textarea"
                     control={control}
                     errors={errors}
                     placeholder="Any specific requirements for travel (e.g., wheelchair access, medical conditions, etc.)"
                   />
-
-                  {/* Show potential group information */}
-                  {watch("connectWithNavodayans") === "yes" && (
-                    <div className="mt-6">
-                      <h3 className="text-lg font-medium text-gray-900 mb-4">
-                        Group Travel Information
-                      </h3>
-                      <div className="bg-blue-50 p-4 rounded-lg">
-                        <p className="text-blue-800 text-sm">
-                          Based on your location and preferences, we'll:
-                        </p>
-                        <ul className="list-disc list-inside text-blue-800 text-sm mt-2 space-y-1">
-                          <li>Group you with other alumni from your area</li>
-                          <li>Coordinate group transportation arrangements</li>
-                          <li>Share travel details once the group is formed</li>
-                          <li>
-                            Provide pickup points based on the group's location
-                          </li>
-                          {(watch("modeOfTransport") === "car" ||
-                            watch("modeOfTransport") === "two-wheeler") &&
-                            watch("readyForRideShare") === "yes" && (
-                              <li>
-                                Coordinate ride sharing with other alumni in
-                                your area
-                              </li>
-                            )}
-                          {watch("modeOfTransport") === "sharing" && (
-                            <li>
-                              Connect you with alumni who can provide rides from
-                              your starting point
-                            </li>
-                          )}
-                          {watch("modeOfTransport") &&
-                            !["car", "two-wheeler", "sharing"].includes(
-                              watch("modeOfTransport")
-                            ) && (
-                              <li>
-                                Arrange shared transportation from your starting
-                                point
-                              </li>
-                            )}
-                        </ul>
-                      </div>
-                    </div>
-                  )}
-                </motion.div>
-              )}
+                </div>
+              </div>
             </div>
           </FormSection>
         )}
@@ -2386,6 +2363,7 @@ const AlumniRegistrationForm = ({ onBack, storageKey }) => {
                             watch("accommodationNeeded") || {
                               male: 0,
                               female: 0,
+                              other: 0,
                             }
                           }
                           onChange={(newValues) => {
@@ -2396,6 +2374,90 @@ const AlumniRegistrationForm = ({ onBack, storageKey }) => {
                         />
                       </div>
                     </>
+                  )}
+
+                  {accommodation === "discount-hotel" && (
+                    <div className="space-y-4">
+                      <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4">
+                        <p className="text-sm text-blue-800">
+                          Please provide details about your hotel requirements.
+                          We will try to arrange discounted rates with nearby
+                          hotels.
+                        </p>
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <FormField
+                          label="Number of Adults"
+                          name="hotelRequirements.adults"
+                          type="number"
+                          control={control}
+                          errors={errors}
+                          min={1}
+                          defaultValue={1}
+                        />
+                        <FormField
+                          label="Children (Above 11 years)"
+                          name="hotelRequirements.childrenAbove11"
+                          type="number"
+                          control={control}
+                          errors={errors}
+                          min={0}
+                        />
+                        <FormField
+                          label="Children (5-11 years)"
+                          name="hotelRequirements.children5to11"
+                          type="number"
+                          control={control}
+                          errors={errors}
+                          min={0}
+                        />
+                      </div>
+
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <FormField
+                          label="Check-in Date"
+                          name="hotelRequirements.checkInDate"
+                          type="date"
+                          control={control}
+                          errors={errors}
+                          min={new Date().toISOString().split("T")[0]}
+                          className="date-picker"
+                        />
+                        <FormField
+                          label="Check-out Date"
+                          name="hotelRequirements.checkOutDate"
+                          type="date"
+                          control={control}
+                          errors={errors}
+                          min={new Date().toISOString().split("T")[0]}
+                          className="date-picker"
+                        />
+                      </div>
+
+                      <FormField
+                        label="Room Preference"
+                        name="hotelRequirements.roomPreference"
+                        type="select"
+                        control={control}
+                        errors={errors}
+                        options={[
+                          { value: "single", label: "Single Room" },
+                          { value: "double", label: "Double Room" },
+                          { value: "triple", label: "Triple Room" },
+                          { value: "suite", label: "Suite" },
+                        ]}
+                      />
+
+                      <FormField
+                        label="Special Requests"
+                        name="hotelRequirements.specialRequests"
+                        type="textarea"
+                        control={control}
+                        errors={errors}
+                        placeholder="Any special requirements or preferences (e.g., extra bed, specific floor, accessibility needs)"
+                      />
+                    </div>
                   )}
 
                   {accommodation != "not-required" && (
@@ -2913,32 +2975,25 @@ const AlumniRegistrationForm = ({ onBack, storageKey }) => {
               isOpen={showFinancialDifficultyDialog}
               onClose={() => setShowFinancialDifficultyDialog(false)}
               totalExpense={(() => {
-                const attendees = watch("attendees");
-                const adultCount =
-                  (attendees?.adults?.veg || 0) +
-                  (attendees?.adults?.nonVeg || 0);
-                const teenCount =
-                  (attendees?.teens?.veg || 0) +
-                  (attendees?.teens?.nonVeg || 0);
-                const childCount =
-                  (attendees?.children?.veg || 0) +
-                  (attendees?.children?.nonVeg || 0);
-                return adultCount * 500 + teenCount * 350 + childCount * 150;
+                return watch("proposedAmount");
               })()}
               contributionAmount={watch("contributionAmount") || 0}
               userSchool={watch("school")}
-              onProceedWithPayment={() => {
-                // Mark registration as incomplete and proceed with lower amount
+              onConfirm={async () => {
+                // Mark registration as incomplete and proceed with submission
                 setValue("registrationStatus", "incomplete");
                 setValue("paymentStatus", "financial-difficulty");
-                proceedWithPayment(watch("contributionAmount"));
+                await handleSubmitForm();
               }}
               onAddMoreAmount={() => {
-                // Focus back on contribution amount field for user to add more
+                setShowFinancialDifficultyDialog(false);
+                // Focus back on contribution amount field
                 const contributionField =
                   document.getElementsByName("contributionAmount")[0];
                 if (contributionField) {
                   contributionField.focus();
+                  // Optionally select the current value for easy editing
+                  contributionField.select();
                 }
               }}
             />

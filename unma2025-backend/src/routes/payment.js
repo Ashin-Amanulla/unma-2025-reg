@@ -11,7 +11,7 @@ import { PAYMENT_GATEWAY_API_KEY, PAYMENT_GATEWAY_ENCRYPTION_KEY, PAYMENT_GATEWA
 
 // Endpoint to create an order
 router.post('/create-order', async (req, res) => {
-    const { amount, currency } = req.body;
+    const { amount, currency,name,email,contact,notes } = req.body;
 
     try {
         const options = {
@@ -20,6 +20,9 @@ router.post('/create-order', async (req, res) => {
         };
 
         const order = await razorpayInstance.orders.create(options);
+       
+    
+       
         res.status(200).json(order);
     } catch (error) {
         console.error(error);
@@ -29,10 +32,9 @@ router.post('/create-order', async (req, res) => {
 
 router.post('/verify-payment', async (req, res) => {
     const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = req.body;
-
     try {
         const payment = await razorpayInstance.payments.fetch(razorpay_payment_id);
-        console.log(payment);
+        console.log('payment',payment);
         res.status(200).json(payment);
     } catch (error) {
         console.error(error);

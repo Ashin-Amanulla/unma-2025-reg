@@ -14,7 +14,8 @@ import {
     importRegistrations,
     bulkUpdateRegistrations,
     saveRegistrationStep,
-    sendMessage
+    sendMessage,
+    transactionRegister
 } from '../controllers/registrations.controller.js';
 import { verifyToken, verifyAdmin } from '../middleware/auth.js';
 
@@ -65,5 +66,8 @@ router.put('/:id', verifyToken, updateRegistration);
 router.delete('/:id', verifyToken, verifyAdmin, deleteRegistration);
 
 router.post('/send-message', sendMessage);
+
+//transaction register
+router.post('/transaction/:id', transactionRegister);
 
 export default router;

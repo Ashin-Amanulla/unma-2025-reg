@@ -84,8 +84,13 @@ const SponsorshipSchema = new mongoose.Schema(
 
 const TransportationSchema = new mongoose.Schema(
   {
-    planTravel: { type: Boolean, default: false },
+    // First Segment Fields
     travelConsistsTwoSegments: { type: String },
+    connectWithNavodayansFirstSegment: { type: String },
+    firstSegmentStartingLocation: { type: String },
+    firstSegmentTravelDate: { type: String },
+
+    // Main Transportation Fields
     startingLocation: { type: String },
     startPincode: { type: String },
     pinDistrict: { type: String },
@@ -97,11 +102,13 @@ const TransportationSchema = new mongoose.Schema(
     travelDate: { type: String },
     travelTime: { type: String },
     modeOfTransport: { type: String },
-    readyForRideShare: { type: String },
-    rideShareCapacity: { type: Number, min: 0 },
+
+    // Vehicle and Carpooling Fields
     needParking: { type: String },
-    wantRideShare: { type: String },
-    rideShareGroupSize: { type: Number, min: 0 },
+    connectWithNavodayans: { type: String },
+    readyForRideShare: { type: String },
+    vehicleCapacity: { type: Number, min: 0 },
+    groupSize: { type: Number, min: 0 },
     travelSpecialRequirements: { type: String },
   },
   { _id: false }
@@ -124,8 +131,19 @@ const AccommodationSchema = new mongoose.Schema(
     accommodationNeeded: {
       male: { type: Number, default: 0, min: 0 },
       female: { type: Number, default: 0, min: 0 },
+      other: { type: Number, default: 0, min: 0 },
     },
     accommodationGender: { type: String },
+    // Hotel specific fields
+    hotelRequirements: {
+      adults: { type: Number, default: 0, min: 0 },
+      childrenAbove11: { type: Number, default: 0, min: 0 },
+      children5to11: { type: Number, default: 0, min: 0 },
+      checkInDate: { type: String },
+      checkOutDate: { type: String },
+      roomPreference: { type: String }, // single, double, triple, etc.
+      specialRequests: { type: String },
+    },
   },
   { _id: false }
 );

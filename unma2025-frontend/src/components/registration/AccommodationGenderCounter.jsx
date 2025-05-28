@@ -64,10 +64,10 @@ const AccommodationGenderCounter = ({ values = defaultValues, onChange }) => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700 text-center">
-                👨 Male
+                 Male
               </label>
               <div className="flex justify-center">
                 {renderCounter("male", "Male")}
@@ -76,10 +76,18 @@ const AccommodationGenderCounter = ({ values = defaultValues, onChange }) => {
 
             <div className="space-y-2">
               <label className="block text-sm font-medium text-gray-700 text-center">
-                👩 Female
+                Female
               </label>
               <div className="flex justify-center">
                 {renderCounter("female", "Female")}
+              </div>
+            </div>
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700 text-center">
+                Others
+              </label>
+              <div className="flex justify-center">
+                {renderCounter("other", "Others")}
               </div>
             </div>
           </div>

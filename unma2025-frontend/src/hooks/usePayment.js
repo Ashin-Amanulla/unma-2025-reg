@@ -21,7 +21,6 @@ export const usePayment = () => {
             // Create order through API
             const res = await paymentApi.createOrder({ amount });
          
-         console.log('res',res);
             const { id, amount: orderAmount, currency } = res;
 
             const options = {
@@ -33,6 +32,7 @@ export const usePayment = () => {
                 order_id: id,
                 handler: async (response) => {
                     try {
+                        console.log('response',response);
                         // Verify payment
                         await paymentApi.verifyPayment(response);
                         toast.success("Payment successful!");

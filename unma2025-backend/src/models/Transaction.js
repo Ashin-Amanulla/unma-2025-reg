@@ -3,7 +3,7 @@ import mongoose from 'mongoose';
 const TransactionSchema = new mongoose.Schema({
     // Transaction identifiers
     transactionId: { type: String, required: true, unique: true },
-    registrationId: { type: mongoose.Schema.Types.ObjectId, ref: 'Registration' },
+    registrationId: { type: String, required: true, unique: true },
 
     // User information (can be null for anonymous payments)
     name: { type: String },
@@ -28,7 +28,7 @@ const TransactionSchema = new mongoose.Schema({
     purpose: {
         type: String,
         required: true,
-        enum: ['registration', 'donation', 'sponsorship', 'merchandise', 'other']
+        enum: ['registration', 'contribution', 'sponsorship', 'merchandise', 'other']
     },
     isAnonymous: { type: Boolean, default: false },
 
