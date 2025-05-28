@@ -165,6 +165,7 @@ const AlumniRegistrationForm = ({ onBack, storageKey }) => {
       canReferSponsorship: false,
 
       // Transportation
+      isTravelling: false,
       travelConsistsTwoSegments: "",
       connectWithNavodayansFirstSegment: "",
       firstSegmentStartingLocation: "",
@@ -786,6 +787,7 @@ const AlumniRegistrationForm = ({ onBack, storageKey }) => {
           sponsorshipDetails: formData.sponsorshipDetails,
         },
         transportation: {
+          isTravelling: formData.isTravelling,
           travelConsistsTwoSegments: formData.travelConsistsTwoSegments,
           connectWithNavodayansFirstSegment:
             formData.connectWithNavodayansFirstSegment,
@@ -1105,8 +1107,11 @@ const AlumniRegistrationForm = ({ onBack, storageKey }) => {
         const childCount =
           (attendees?.children?.veg || 0) + (attendees?.children?.nonVeg || 0);
 
+        //if isRecentGraduate is true, then the total expense is 350 for only one adult and 350 for each teen and child
+        // minus 1 from adult count , charge 350 , then rest adult count *500
+
         const totalExpense = isRecentGraduate
-          ? adultCount * 350 + teenCount * 350 + childCount * 350
+          ? (adultCount - 1) * 500 + 350 + teenCount * 350 + childCount * 350
           : adultCount * 500 + teenCount * 350 + childCount * 350;
         setValue("proposedAmount", totalExpense);
 
@@ -1626,44 +1631,69 @@ const AlumniRegistrationForm = ({ onBack, storageKey }) => {
                         });
                       }}
                     />
+                    <hr className="my-4 border-gray-300" />
+                    {/* Additional Offerings Section */}
+                    <div className="bg-purple-200 border-purple-200 rounded-xl p-6 mt-8 shadow-sm">
+                      <div className="space-y-6">
+                        <div className="flex items-center space-x-3 mb-4">
+                          <h3 className="text-xl font-semibold text-gray-900">
+                            Your Interest in Additional Offerings
+                          </h3>
+                        </div>
 
-                    <hr />
+                        <div className="bg-white rounded-lg p-4 border border-blue-100">
+                          <p className="text-sm text-gray-600 mb-4">
+                            Share your ideas for additional activities,
+                            workshops, or sessions you'd like to contribute
+                            during the meet.
+                          </p>
 
-                    <div className="space-y-4 mt-8">
-                      <h3 className="text-lg font-medium text-gray-900">
-                        <strong>
-                          Your interest in additional offerings during the meet
-                        </strong>
-                      </h3>
-                      <hr />
-                      <FormField
-                        label="What would you like to do additionally during the meet?"
-                        name="eventParticipation"
-                        type="multiselect"
-                        control={control}
-                        errors={errors}
-                        options={EVENT_PARTICIPATION_OPTIONS}
-                      />
+                          <div className="space-y-4">
+                            <FormField
+                              label="What would you like to do additionally during the meet?"
+                              name="eventParticipation"
+                              type="multiselect"
+                              control={control}
+                              errors={errors}
+                              options={EVENT_PARTICIPATION_OPTIONS}
+                            />
 
-                      <FormField
-                        label="Please explain your proposal in detail"
-                        name="participationDetails"
-                        type="textarea"
-                        control={control}
-                        errors={errors}
-                        placeholder="Provide detailed information about your proposed offering, including any specific requirements, duration, space needed, etc."
-                        rows={4}
-                      />
-                      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
-                        <p className="text-yellow-800 text-sm">
-                          <strong>
-                            Note: Kindly note that this is purely for the
-                            purpose of planning. Your interest for additional
-                            offering will be considered based on the
-                            requirements and other logistics factors(time, space
-                            etc.) for inclusion.
-                          </strong>
-                        </p>
+                            <FormField
+                              label="Please explain your proposal in detail"
+                              name="participationDetails"
+                              type="textarea"
+                              control={control}
+                              errors={errors}
+                              placeholder="Provide detailed information about your proposed offering, including any specific requirements, duration, space needed, etc."
+                              rows={4}
+                            />
+                          </div>
+                        </div>
+
+                        <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                          <div className="flex items-start space-x-2">
+                            <svg
+                              className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0"
+                              fill="none"
+                              stroke="currentColor"
+                              viewBox="0 0 24 24"
+                            >
+                              <path
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                                strokeWidth={2}
+                                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                              />
+                            </svg>
+                            <p className="text-amber-800 text-sm">
+                              <strong>Planning Purpose:</strong> This
+                              information is purely for planning purposes. Your
+                              interest for additional offerings will be
+                              considered based on requirements and logistics
+                              factors (time, space, etc.) for inclusion.
+                            </p>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -1741,266 +1771,175 @@ const AlumniRegistrationForm = ({ onBack, storageKey }) => {
         {currentStep === 5 && isAttending && (
           <FormSection title="Transportation Details">
             <div className="space-y-6">
-              {/* Section 1: Two Segments Travel */}
               <div className="flex items-start mb-4">
                 <div className="flex items-center h-5">
                   <input
-                    id="travelConsistsTwoSegments"
+                    id="isTravelling"
                     type="checkbox"
                     className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
-                    checked={watch("travelConsistsTwoSegments") === "yes"}
-                    onChange={(e) =>
-                      setValue(
-                        "travelConsistsTwoSegments",
-                        e.target.checked ? "yes" : "no"
-                      )
-                    }
+                    checked={watch("isTravelling")}
+                    onChange={(e) => setValue("isTravelling", e.target.checked)}
                   />
                 </div>
                 <div className="ml-3 text-sm">
                   <label
-                    htmlFor="travelConsistsTwoSegments"
+                    htmlFor="isTravelling"
                     className="font-medium text-gray-900"
                   >
-                    Does your travel consist of 2 segments:
+                    Plan your travel for UNMA Meet 2025
                   </label>
-                  <p className="text-gray-500">
-                    (First from the city you are travelling to Kerala and second
-                    from a town in Kerala to the venue)
-                  </p>
+                  <div className="bg-blue-50 p-4 rounded-lg mb-6">
+                    <p className="text-blue-800 text-sm">
+                      This information will assist us in coordinating
+                      transportation arrangements for participants attending the
+                      meet. We kindly request both those in need of
+                      transportation and those willing to provide transportation
+                      to submit their details accordingly. Later, you will have
+                      an opportunity to update the changes, if any, in your plan
+                    </p>
+                  </div>
                 </div>
               </div>
 
-              {/* Fields that appear only if two segments is checked */}
-              {watch("travelConsistsTwoSegments") === "yes" && (
-                <motion.div
-                  initial={{ opacity: 0, height: 0 }}
-                  animate={{ opacity: 1, height: "auto" }}
-                  exit={{ opacity: 0, height: 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="space-y-4 pl-4 border-l-2 border-blue-200"
-                >
-                  <FormField
-                    label="Would you like to connect with other Navodayans from your starting point for better planning?"
-                    name="connectWithNavodayansFirstSegment"
-                    type="select"
-                    control={control}
-                    errors={errors}
-                    options={[
-                      { value: "yes", label: "Yes" },
-                      { value: "no", label: "No" },
-                    ]}
-                  />
-
-                  <FormField
-                    label="Starting Location"
-                    name="firstSegmentStartingLocation"
-                    type="text"
-                    control={control}
-                    errors={errors}
-                    placeholder="Enter city/town name (use official names)"
-                  />
-
-                  <FormField
-                    label="Expected Travel Date"
-                    name="firstSegmentTravelDate"
-                    type="date"
-                    control={control}
-                    errors={errors}
-                    min={new Date().toISOString().split("T")[0]}
-                    className="date-picker"
-                  />
-                </motion.div>
-              )}
-
-              {/* Section 2: Transportation to Venue */}
-              <div className="mt-8">
-                <h3 className="text-lg font-medium text-gray-900 mb-4">
-                  Transportation to Venue
-                </h3>
-                <div className="space-y-4">
-                  <FormField
-                    label="Starting Location"
-                    name="startingLocation"
-                    type="text"
-                    control={control}
-                    errors={errors}
-                    placeholder="Enter your starting location"
-                  />
-
-                  <FormField
-                    label="Mode of Transport"
-                    name="modeOfTransport"
-                    type="select"
-                    control={control}
-                    errors={errors}
-                    options={[
-                      { value: "boat", label: "Boat/Ship" },
-                      { value: "bus", label: "Bus" },
-                      { value: "car", label: "Car" },
-                      { value: "flight", label: "Flight" },
-                      {
-                        value: "looking-for-transport",
-                        label: "I am looking for a transportation/lift",
-                      },
-                      { value: "other", label: "Other" },
-                      { value: "train", label: "Train" },
-                      { value: "two-wheeler", label: "Two Wheeler" },
-                    ]}
-                  />
-
-                  <FormField
-                    label="Starting Location Pincode"
-                    name="startPincode"
-                    type="text"
-                    control={control}
-                    errors={errors}
-                    placeholder="Enter your starting location pincode"
-                    pattern="[0-9]{6}"
-                    maxLength={6}
-                    onChange={async (e) => {
-                      const pincodeValue = e.target.value;
-                      if (pincodeValue.length === 6) {
-                        try {
-                          toast.info("Fetching location details...", {
-                            autoClose: false,
-                            closeButton: false,
-                            isLoading: true,
-                          });
-
-                          const data = await getPincodeDetails(pincodeValue);
-
-                          if (
-                            data &&
-                            data[0] &&
-                            data[0].Status === "Success" &&
-                            data[0].PostOffice &&
-                            data[0].PostOffice.length > 0
-                          ) {
-                            const postOffice = data[0].PostOffice[0];
-                            setValue("pinDistrict", postOffice.District);
-                            setValue("pinState", postOffice.State);
-                            setValue(
-                              "pinTaluk",
-                              postOffice.Block || postOffice.District
-                            );
-                            toast.dismiss();
-                            toast.success(
-                              `Location found: ${postOffice.District}, ${postOffice.State}`
-                            );
-                          } else {
-                            setValue("pinDistrict", "");
-                            setValue("pinState", "");
-                            setValue("pinTaluk", "");
-                            toast.dismiss();
-                            toast.error(
-                              "Invalid pincode or location not found"
-                            );
-                          }
-                        } catch (error) {
-                          setValue("pinDistrict", "");
-                          setValue("pinState", "");
-                          setValue("pinTaluk", "");
-                          toast.dismiss();
-                          toast.error(
-                            "Error fetching location details. Please try again."
-                          );
+              {watch("isTravelling") && (
+                <>
+                  {/* Section 1: Two Segments Travel */}
+                  <div className="flex items-start mb-4">
+                    <div className="flex items-center h-5">
+                      <input
+                        id="travelConsistsTwoSegments"
+                        type="checkbox"
+                        className="w-5 h-5 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                        checked={watch("travelConsistsTwoSegments") === "yes"}
+                        onChange={(e) =>
+                          setValue(
+                            "travelConsistsTwoSegments",
+                            e.target.checked ? "yes" : "no"
+                          )
                         }
-                      }
-                    }}
-                  />
+                      />
+                    </div>
+                    <div className="ml-3">
+                      <label
+                        htmlFor="travelConsistsTwoSegments"
+                        className="text-sm font-medium text-gray-900"
+                      >
+                        Does your travel consist of 2 segments?
+                      </label>
+                      <p className="text-xs text-gray-600 mt-1">
+                        Check this if you're traveling:{" "}
+                        <strong>First from your city to Kerala</strong>, then{" "}
+                        <strong>from a town in Kerala to the venue</strong>
+                      </p>
+                    </div>
+                  </div>
 
-                  {/* Display location details if pincode is valid */}
-                  {watch("startPincode")?.length === 6 && (
-                    <div className="bg-gray-50 p-4 rounded-lg">
-                      <h4 className="text-sm font-medium text-gray-700 mb-2">
-                        Location Details
-                      </h4>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div>
-                          <p className="text-sm text-gray-500">District</p>
-                          <p className="text-sm font-medium">
-                            {watch("pinDistrict") || "Not found"}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-gray-500">Taluk/Block</p>
-                          <p className="text-sm font-medium">
-                            {watch("pinTaluk") || "Not found"}
-                          </p>
-                        </div>
-                        <div>
-                          <p className="text-sm text-gray-500">State</p>
-                          <p className="text-sm font-medium">
-                            {watch("pinState") || "Not found"}
-                          </p>
+                  {/* Two Segments Explanation */}
+                  {watch("travelConsistsTwoSegments") === "yes" && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="mt-6"
+                    >
+                      {/* Visual Journey Indicator */}
+                      <div className="bg-white rounded-lg p-4 mb-6 border border-blue-200">
+                        <h4 className="text-sm font-semibold text-gray-800 mb-3 text-center">
+                          Your Travel Journey
+                        </h4>
+                        <div className="flex items-center justify-center space-x-4">
+                          <div className="flex flex-col items-center">
+                            <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                              1
+                            </div>
+                            <p className="text-xs text-center mt-2 font-medium text-gray-700">
+                              Your City
+                            </p>
+                            <p className="text-xs text-center text-gray-500">
+                              Starting Point
+                            </p>
+                          </div>
+                          <div className="flex-1 h-0.5 bg-blue-300 relative">
+                            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-blue-50 px-2">
+                              <svg
+                                className="w-4 h-4 text-blue-500"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="2"
+                                  d="M17 8l4 4m0 0l-4 4m4-4H3"
+                                />
+                              </svg>
+                            </div>
+                          </div>
+                          <div className="flex flex-col items-center">
+                            <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                              2
+                            </div>
+                            <p className="text-xs text-center mt-2 font-medium text-gray-700">
+                              Kerala
+                            </p>
+                            <p className="text-xs text-center text-gray-500">
+                              Intermediate Stop
+                            </p>
+                          </div>
+                          <div className="flex-1 h-0.5 bg-green-300 relative">
+                            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-green-50 px-2">
+                              <svg
+                                className="w-4 h-4 text-green-500"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth="2"
+                                  d="M17 8l4 4m0 0l-4 4m4-4H3"
+                                />
+                              </svg>
+                            </div>
+                          </div>
+                          <div className="flex flex-col items-center">
+                            <div className="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                              3
+                            </div>
+                            <p className="text-xs text-center mt-2 font-medium text-gray-700">
+                              Venue
+                            </p>
+                            <p className="text-xs text-center text-gray-500">
+                              Final Destination
+                            </p>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  )}
 
-                  <FormField
-                    label="Nearest Landmark"
-                    name="nearestLandmark"
-                    type="text"
-                    control={control}
-                    errors={errors}
-                    placeholder="e.g., Railway Station, Bus Stand, etc."
-                  />
+                      {/* Segment 1: Travel to Kerala */}
+                      <div className="bg-gradient-to-r from-blue-50 to-blue-100 border-l-4 border-blue-500 rounded-lg p-6 mb-6">
+                        <div className="flex items-center mb-4">
+                          <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold text-sm mr-3">
+                            1
+                          </div>
+                          <div>
+                            <h3 className="text-lg font-semibold text-blue-800">
+                              First Segment: Travel to Kerala
+                            </h3>
+                            <p className="text-sm text-blue-600">
+                              Details about your journey from your starting city
+                              to Kerala
+                            </p>
+                          </div>
+                        </div>
 
-                  <FormField
-                    label="Travel Date"
-                    name="travelDate"
-                    type="date"
-                    control={control}
-                    errors={errors}
-                    min={new Date().toISOString().split("T")[0]}
-                    className="date-picker"
-                  />
-
-                  <FormField
-                    label="Start Time"
-                    name="travelTime"
-                    type="time"
-                    control={control}
-                    errors={errors}
-                    className="time-picker"
-                  />
-
-                  {/* Parking and ride sharing options for vehicles */}
-                  {["car", "two-wheeler", "bus"].includes(
-                    watch("modeOfTransport")
-                  ) && (
-                    <>
-                      <FormField
-                        label="Will you need parking at the venue?"
-                        name="needParking"
-                        type="select"
-                        control={control}
-                        errors={errors}
-                        options={[
-                          { value: "yes", label: "Yes" },
-                          { value: "no", label: "No" },
-                        ]}
-                      />
-
-                      <FormField
-                        label="Would you like to connect with other Navodayans for better planning or carpooling arrangements?"
-                        name="connectWithNavodayans"
-                        type="select"
-                        control={control}
-                        errors={errors}
-                        options={[
-                          { value: "yes", label: "Yes" },
-                          { value: "no", label: "No" },
-                        ]}
-                      />
-
-                      {watch("connectWithNavodayans") === "yes" && (
-                        <>
+                        <div className="space-y-4">
                           <FormField
-                            label="Will you be ready for ride sharing with fellow Navodayans from your area?"
-                            name="readyForRideShare"
+                            label="Would you like to connect with other Navodayans from your starting point for better planning?"
+                            name="connectWithNavodayansFirstSegment"
                             type="select"
                             control={control}
                             errors={errors}
@@ -2010,47 +1949,316 @@ const AlumniRegistrationForm = ({ onBack, storageKey }) => {
                             ]}
                           />
 
-                          {watch("readyForRideShare") === "yes" && (
-                            <FormField
-                              label="How many people can you accommodate in your vehicle?"
-                              name="vehicleCapacity"
-                              type="number"
-                              control={control}
-                              errors={errors}
-                              min={1}
-                              max={10}
-                              helperText="Including yourself, total number of people (gender doesn't matter, Navodayans will adjust)"
-                            />
+                          <FormField
+                            label="Starting Location (Your City/Town)"
+                            name="firstSegmentStartingLocation"
+                            type="text"
+                            control={control}
+                            errors={errors}
+                            placeholder="Enter your starting city/town name (use official names)"
+                            helperText="The city/town from where you'll begin your journey to Kerala"
+                          />
+
+                          <FormField
+                            label="Expected Travel Date to Kerala"
+                            name="firstSegmentTravelDate"
+                            type="date"
+                            control={control}
+                            errors={errors}
+                            min={new Date().toISOString().split("T")[0]}
+                            className="date-picker"
+                            helperText="Date when you plan to reach Kerala"
+                          />
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                  {/* </div> */}
+
+                  {/* Section 2: Transportation to Venue (Always visible) */}
+                  <div className="bg-gradient-to-r from-purple-50 to-purple-100 border-l-4 border-purple-500 rounded-lg p-6">
+                    <div className="flex items-center mb-6">
+                      <div
+                        className={`w-8 h-8 ${
+                          watch("travelConsistsTwoSegments") === "yes"
+                            ? "bg-green-500"
+                            : "bg-purple-500"
+                        } rounded-full flex items-center justify-center text-white font-bold text-sm mr-3`}
+                      >
+                        {watch("travelConsistsTwoSegments") === "yes"
+                          ? "2"
+                          : "1"}
+                      </div>
+                      <div>
+                        <h3 className="text-lg font-semibold text-purple-800">
+                          {watch("travelConsistsTwoSegments") === "yes"
+                            ? "Second Segment: Transportation from Kerala to Venue"
+                            : "Transportation to Venue"}
+                        </h3>
+                        <p className="text-sm text-purple-600">
+                          {watch("travelConsistsTwoSegments") === "yes"
+                            ? "Details about your travel from Kerala to the event venue"
+                            : "Details about your direct travel to the event venue"}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="space-y-4">
+                      <FormField
+                        label={
+                          watch("travelConsistsTwoSegments") === "yes"
+                            ? "Starting Location in Kerala"
+                            : "Starting Location"
+                        }
+                        name="startingLocation"
+                        type="text"
+                        control={control}
+                        errors={errors}
+                        placeholder={
+                          watch("travelConsistsTwoSegments") === "yes"
+                            ? "Enter your starting location in Kerala"
+                            : "Enter your starting location"
+                        }
+                        helperText={
+                          watch("travelConsistsTwoSegments") === "yes"
+                            ? "The place in Kerala from where you'll travel to the venue"
+                            : "Your direct starting location to the venue"
+                        }
+                      />
+
+                      <FormField
+                        label="Mode of Transport"
+                        name="modeOfTransport"
+                        type="select"
+                        control={control}
+                        errors={errors}
+                        options={[
+                          { value: "boat", label: "Boat/Ship" },
+                          { value: "bus", label: "Bus" },
+                          { value: "car", label: "Car" },
+                          { value: "flight", label: "Flight" },
+                          {
+                            value: "looking-for-transport",
+                            label: "I’m looking for a ride",
+                          },
+                          { value: "other", label: "Other" },
+                          { value: "train", label: "Train" },
+                          { value: "two-wheeler", label: "Two Wheeler" },
+                        ]}
+                      />
+
+                      <FormField
+                        label={
+                          watch("travelConsistsTwoSegments") === "yes"
+                            ? "Kerala Location Pincode"
+                            : "Starting Location Pincode"
+                        }
+                        name="startPincode"
+                        type="text"
+                        control={control}
+                        errors={errors}
+                        placeholder="Enter pincode"
+                        pattern="[0-9]{6}"
+                        maxLength={6}
+                        onChange={async (e) => {
+                          const pincodeValue = e.target.value;
+                          if (pincodeValue.length === 6) {
+                            try {
+                              toast.info("Fetching location details...", {
+                                autoClose: false,
+                                closeButton: false,
+                                isLoading: true,
+                              });
+
+                              const data = await getPincodeDetails(
+                                pincodeValue
+                              );
+
+                              if (
+                                data &&
+                                data[0] &&
+                                data[0].Status === "Success" &&
+                                data[0].PostOffice &&
+                                data[0].PostOffice.length > 0
+                              ) {
+                                const postOffice = data[0].PostOffice[0];
+                                setValue("pinDistrict", postOffice.District);
+                                setValue("pinState", postOffice.State);
+                                setValue(
+                                  "pinTaluk",
+                                  postOffice.Block || postOffice.District
+                                );
+                                toast.dismiss();
+                                toast.success(
+                                  `Location found: ${postOffice.District}, ${postOffice.State}`
+                                );
+                              } else {
+                                setValue("pinDistrict", "");
+                                setValue("pinState", "");
+                                setValue("pinTaluk", "");
+                                toast.dismiss();
+                                toast.error(
+                                  "Invalid pincode or location not found"
+                                );
+                              }
+                            } catch (error) {
+                              setValue("pinDistrict", "");
+                              setValue("pinState", "");
+                              setValue("pinTaluk", "");
+                              toast.dismiss();
+                              toast.error(
+                                "Error fetching location details. Please try again."
+                              );
+                            }
+                          }
+                        }}
+                      />
+
+                      {/* Display location details if pincode is valid */}
+                      {watch("startPincode")?.length === 6 && (
+                        <div className="bg-white/70 backdrop-blur-sm p-4 rounded-lg border border-purple-200">
+                          <h4 className="text-sm font-medium text-gray-700 mb-2">
+                            Location Details
+                          </h4>
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div>
+                              <p className="text-sm text-gray-500">District</p>
+                              <p className="text-sm font-medium">
+                                {watch("pinDistrict") || "Not found"}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-sm text-gray-500">
+                                Taluk/Block
+                              </p>
+                              <p className="text-sm font-medium">
+                                {watch("pinTaluk") || "Not found"}
+                              </p>
+                            </div>
+                            <div>
+                              <p className="text-sm text-gray-500">State</p>
+                              <p className="text-sm font-medium">
+                                {watch("pinState") || "Not found"}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      <FormField
+                        label="Nearest Landmark"
+                        name="nearestLandmark"
+                        type="text"
+                        control={control}
+                        errors={errors}
+                        placeholder="e.g., Railway Station, Bus Stand, etc."
+                      />
+
+                      <FormField
+                        label="Travel Date"
+                        name="travelDate"
+                        type="date"
+                        control={control}
+                        errors={errors}
+                        min={new Date().toISOString().split("T")[0]}
+                        className="date-picker"
+                      />
+
+                      <FormField
+                        label="Start Time"
+                        name="travelTime"
+                        type="time"
+                        control={control}
+                        errors={errors}
+                        className="time-picker"
+                      />
+
+                      {/* Parking and ride sharing options for vehicles */}
+                      {["car", "two-wheeler", "bus"].includes(
+                        watch("modeOfTransport")
+                      ) && (
+                        <>
+                          <FormField
+                            label="Will you need parking at the venue?"
+                            name="needParking"
+                            type="select"
+                            control={control}
+                            errors={errors}
+                            options={[
+                              { value: "yes", label: "Yes" },
+                              { value: "no", label: "No" },
+                            ]}
+                          />
+
+                          <FormField
+                            label="Would you like to connect with other Navodayans for better planning or carpooling arrangements?"
+                            name="connectWithNavodayans"
+                            type="select"
+                            control={control}
+                            errors={errors}
+                            options={[
+                              { value: "yes", label: "Yes" },
+                              { value: "no", label: "No" },
+                            ]}
+                          />
+
+                          {watch("connectWithNavodayans") === "yes" && (
+                            <>
+                              <FormField
+                                label="Will you be ready for ride sharing with fellow Navodayans from your area?"
+                                name="readyForRideShare"
+                                type="select"
+                                control={control}
+                                errors={errors}
+                                options={[
+                                  { value: "yes", label: "Yes" },
+                                  { value: "no", label: "No" },
+                                ]}
+                              />
+
+                              {watch("readyForRideShare") === "yes" && (
+                                <FormField
+                                  label="How many people can you accommodate in your vehicle?"
+                                  name="vehicleCapacity"
+                                  type="number"
+                                  control={control}
+                                  errors={errors}
+                                  min={1}
+                                  max={10}
+                                  helperText="Including yourself, total number of people (gender doesn't matter, Navodayans will adjust)"
+                                />
+                              )}
+                            </>
                           )}
                         </>
                       )}
-                    </>
-                  )}
 
-                  {/* Fields for those looking for transportation */}
-                  {watch("modeOfTransport") === "looking-for-transport" && (
-                    <FormField
-                      label="How many people including you who needs transportation to venue?"
-                      name="groupSize"
-                      type="number"
-                      control={control}
-                      errors={errors}
-                      min={1}
-                      max={10}
-                      helperText="Total number of people in your group who need transportation"
-                    />
-                  )}
+                      {/* Fields for those looking for transportation */}
+                      {watch("modeOfTransport") === "looking-for-transport" && (
+                        <FormField
+                          label="How many people including you who needs transportation to venue?"
+                          name="groupSize"
+                          type="number"
+                          control={control}
+                          errors={errors}
+                          min={1}
+                          max={10}
+                          helperText="Total number of people in your group who need transportation"
+                        />
+                      )}
 
-                  <FormField
-                    label="Special Requirements"
-                    name="travelSpecialRequirements"
-                    type="textarea"
-                    control={control}
-                    errors={errors}
-                    placeholder="Any specific requirements for travel (e.g., wheelchair access, medical conditions, etc.)"
-                  />
-                </div>
-              </div>
+                      <FormField
+                        label="Special Requirements"
+                        name="travelSpecialRequirements"
+                        type="textarea"
+                        control={control}
+                        errors={errors}
+                        placeholder="Any specific requirements for travel (e.g., wheelchair access, medical conditions, etc.)"
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
           </FormSection>
         )}
@@ -2900,13 +3108,13 @@ const AlumniRegistrationForm = ({ onBack, storageKey }) => {
 
                   <div className="bg-blue-50 border border-blue-200 rounded p-3">
                     <p className="text-xs text-blue-800 font-medium mb-1">
-                      After making the payment:
+                      After making an International payment:
                     </p>
                     <ul className="text-xs text-blue-700 space-y-1">
                       <li>
                         • Email payment receipt to:{" "}
                         <span className="font-medium">
-                          payments@unma2025.org
+                          payments@unma.in
                         </span>
                       </li>
                       <li>

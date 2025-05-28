@@ -254,62 +254,36 @@ const Header = () => {
   );
 };
 
-// Floating Report Issue Button Component
-const FloatingReportButton = () => {
-  const [isOpen, setIsOpen] = useState(false);
-
+const FloatingCreditButton = () => {
   return (
     <div className="fixed bottom-6 right-6 z-40">
-      {isOpen && (
-        <div className="absolute bottom-16 right-0 bg-white rounded-lg shadow-lg p-4 w-64 mb-2 border border-gray-200">
-          <div className="flex justify-between items-center mb-3">
-            <h3 className="text-sm font-medium text-gray-900">
-              Report an Issue
-            </h3>
-            <button
-              onClick={() => setIsOpen(false)}
-              className="text-gray-400 hover:text-gray-500"
-            >
-              <XMarkIcon className="h-5 w-5" />
-            </button>
-          </div>
-          <p className="text-xs text-gray-600 mb-3">
-            Encountered a problem? Let us know so we can fix it.
-          </p>
-          <NavLink
-            to="/report-issue"
-            className="block w-full text-center bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors"
-            onClick={() => setIsOpen(false)}
-          >
-            Report Issue
-          </NavLink>
-        </div>
-      )}
-
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="bg-red-600 hover:bg-red-700 text-white rounded-full p-3 shadow-lg flex items-center justify-center transition-all duration-200 hover:scale-105"
-        title="Report an Issue"
+      <a
+        href="https://xyvin.com"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white rounded-full px-4 py-2 shadow-lg flex items-center justify-center transition-all duration-300 hover:scale-105 text-sm font-medium"
+        title="Visit Xyvin - Web Development Company"
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-6 w-6"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-          />
-        </svg>
-      </button>
+        <span className="flex items-center space-x-2">
+          <span>Crafted </span>
+          {/* <svg
+            className="h-4 w-4 text-red-400 animate-pulse"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+          >
+            <path
+              fillRule="evenodd"
+              d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
+              clipRule="evenodd"
+            />
+          </svg> */}
+          <span className="font-semibold">by Xyvin</span>
+        </span>
+      </a>
     </div>
   );
 };
 
 // Export both components
-export { FloatingReportButton };
+export { FloatingCreditButton };
 export default Header;

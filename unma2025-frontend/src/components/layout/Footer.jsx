@@ -11,8 +11,8 @@ const Footer = () => {
           <div>
             <h3 className="text-xl font-bold mb-4">UNMA 2025</h3>
             <p className="text-gray-300 mb-4">
-              Join us for the JNV Kerala, Mahe and Lakshadweep Alumni Meet, a celebration of memories,
-              connections, and the Navodaya spirit.
+              Join us for the JNV Kerala, Mahe and Lakshadweep Alumni Meet, a
+              celebration of memories, connections, and the Navodaya spirit.
             </p>
             <div className="flex space-x-4">
               <a
@@ -85,7 +85,7 @@ const Footer = () => {
                   Register
                 </Link>
               </li>
-                
+
               <li>
                 <Link
                   to="/admin/login"
@@ -164,7 +164,15 @@ const Footer = () => {
 
         {/* Copyright */}
         <div className="pt-6 border-t border-gray-700 text-center text-gray-400">
-          <p>© {currentYear} United Navodayan Malayalee Association UNMA . All rights reserved.</p>
+          <p>
+            © {currentYear} United Navodayan Malayalee Association UNMA . All
+            rights reserved.
+          </p>
+        </div>
+        <div className="text-center text-gray-400">
+          <p>
+          Crafted with ❤️ by <a href="https://xyvin.com" target="_blank" rel="noopener noreferrer">Xyvin</a>
+          </p>
         </div>
       </div>
     </footer>

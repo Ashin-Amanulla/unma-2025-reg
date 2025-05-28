@@ -85,6 +85,7 @@ const SponsorshipSchema = new mongoose.Schema(
 const TransportationSchema = new mongoose.Schema(
   {
     // First Segment Fields
+    isTravelling: { type: Boolean, default: false },
     travelConsistsTwoSegments: { type: String },
     connectWithNavodayansFirstSegment: { type: String },
     firstSegmentStartingLocation: { type: String },

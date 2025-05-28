@@ -7,7 +7,7 @@ import {
   ArrowRightIcon,
   HomeIcon,
 } from "@heroicons/react/24/outline";
-import { Link as ScrollLink } from "react-scroll";
+import { useNavigate } from "react-router-dom";
 import sendMail from "../api/sendMail";
 import { toast } from "react-toastify";
 import { useForm } from "react-hook-form";
@@ -15,6 +15,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import contactFormSchema from "../zod-form-validators/contactForm";
 
 const Contact = () => {
+  const navigate = useNavigate();
+
   const {
     register,
     handleSubmit,
@@ -29,6 +31,22 @@ const Contact = () => {
       message: "",
     },
   });
+
+  const handleFAQNavigation = () => {
+    // Navigate to home page first
+    navigate("/");
+
+    // After a short delay to ensure the page has loaded, scroll to FAQ section
+    setTimeout(() => {
+      const faqSection = document.getElementById("faq");
+      if (faqSection) {
+        faqSection.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }
+    }, 100);
+  };
 
   const onSubmit = async (data) => {
     try {
@@ -82,13 +100,13 @@ ${data.message}
                 Feel free to reach out using any of the methods below.
               </p>
               <div className="mt-6">
-                <ScrollLink
-                  to="/"
-                  className="inline-flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-full transition duration-300"
+                <button
+                  onClick={() => navigate("/")}
+                  className="inline-flex items-center gap-2 bg-white/20 hover:bg-white/30 text-white px-4 py-2 rounded-full transition duration-300 cursor-pointer"
                 >
                   <HomeIcon className="w-5 h-5" />
                   Return to Home
-                </ScrollLink>
+                </button>
               </div>
             </motion.div>
           </div>
@@ -333,12 +351,12 @@ ${data.message}
                   Before contacting us, you might find answers to your questions
                   in our FAQ section.
                 </p>
-                <ScrollLink
-                  to="/#faq"
-                  className="inline-flex items-center text-primary hover:text-primary-dark gap-1 font-medium"
+                <button
+                  onClick={handleFAQNavigation}
+                  className="inline-flex items-center text-primary hover:text-primary-dark gap-1 font-medium cursor-pointer transition-colors duration-200"
                 >
                   View All FAQs <ArrowRightIcon className="w-4 h-4" />
-                </ScrollLink>
+                </button>
               </div>
             </motion.div>
           </div>

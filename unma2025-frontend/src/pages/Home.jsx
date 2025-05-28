@@ -525,6 +525,343 @@ const Home = () => {
           </div>
         </section>
 
+        {/* Program Schedule */}
+        <section className="py-16 bg-gradient-to-br from-primary/5 to-indigo-50">
+          <div className="container">
+            <motion.div
+              initial={{ y: 30, opacity: 0 }}
+              whileInView={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.8 }}
+              viewport={{ once: true }}
+              className="text-center mb-12"
+            >
+              <span className="inline-block px-6 py-2.5 mb-4 text-sm font-semibold tracking-wider text-white uppercase bg-gradient-to-r from-primary to-primary-dark rounded-full shadow-md">
+                Schedule
+              </span>
+              <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4">
+                Summit 2025 <span className="text-primary">Program</span>
+              </h2>
+              <p className="max-w-3xl mx-auto text-lg text-gray-600">
+                A full day of reconnection, celebration, and memories - August
+                30, 2025
+              </p>
+            </motion.div>
+
+            {/* Horizontal scrollable timeline for mobile, grid for desktop */}
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              whileInView={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              viewport={{ once: true }}
+              className="relative"
+            >
+              {/* Desktop Grid Layout */}
+              <div className="hidden lg:grid lg:grid-cols-3 gap-6 max-w-7xl mx-auto">
+                {[
+                  {
+                    time: "9:00 - 10:00 AM",
+                    title: "Registration & Networking",
+                    icon: <UserGroupIcon className="w-5 h-5" />,
+                    color: "from-blue-500 to-indigo-600",
+                  },
+                  {
+                    time: "10:00 AM - 12:00 PM",
+                    title: "Public Function",
+                    icon: <SparklesIcon className="w-5 h-5" />,
+                    color: "from-purple-500 to-pink-600",
+                  },
+                  {
+                    time: "12:00 - 12:30 PM",
+                    title: "Group Photos",
+                    icon: <CameraIcon className="w-5 h-5" />,
+                    color: "from-green-500 to-teal-600",
+                  },
+                  {
+                    time: "12:30 - 1:00 PM",
+                    title: "Meet & Greet, Stalls Visit",
+                    icon: <MapPinIcon className="w-5 h-5" />,
+                    color: "from-yellow-500 to-orange-600",
+                  },
+                  {
+                    time: "1:00 - 2:00 PM",
+                    title: "Lunch Break",
+                    icon: (
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                        />
+                      </svg>
+                    ),
+                    color: "from-red-500 to-pink-600",
+                  },
+                  {
+                    time: "2:00 - 5:30 PM",
+                    title: "Cultural Programs",
+                    icon: <MusicalNoteIcon className="w-5 h-5" />,
+                    color: "from-indigo-500 to-purple-600",
+                  },
+                  {
+                    time: "5:30 - 6:00 PM",
+                    title: "Tea & Networking",
+                    icon: (
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M17.5 8a2.5 2.5 0 00-5 0c0 .92.498 1.725 1.238 2.166C14.526 10.758 15 11.845 15 13c0 .345-.027.683-.08 1.013a1.5 1.5 0 001.08 1.487c.673 0 1.22-.548 1.22-1.22V13c0-1.657 1.343-3 3-3s3 1.343 3 3c0 .345-.027.683-.08 1.013a1.5 1.5 0 001.08 1.487c.673 0 1.22-.548 1.22-1.22V13c0-1.657-1.343-3-3-3z"
+                        />
+                      </svg>
+                    ),
+                    color: "from-teal-500 to-cyan-600",
+                  },
+                  {
+                    time: "6:00 - 8:00 PM",
+                    title: "Live Entertainment",
+                    icon: (
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
+                        />
+                      </svg>
+                    ),
+                    color: "from-rose-500 to-pink-600",
+                  },
+                  {
+                    time: "8:00 PM",
+                    title: "Closing Ceremony",
+                    icon: (
+                      <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth="2"
+                          d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+                        />
+                      </svg>
+                    ),
+                    color: "from-amber-500 to-yellow-600",
+                  },
+                ].map((item, index) => (
+                  <motion.div
+                    key={index}
+                    initial={{ y: 20, opacity: 0 }}
+                    whileInView={{ y: 0, opacity: 1 }}
+                    transition={{ duration: 0.4, delay: index * 0.05 }}
+                    viewport={{ once: true }}
+                    className="group cursor-pointer"
+                  >
+                    <div className="bg-white rounded-xl p-4 shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100 h-full transform hover:scale-105 hover:-translate-y-1">
+                      <div className="flex items-center gap-3 mb-2">
+                        <div
+                          className={`p-2 rounded-lg bg-gradient-to-br ${item.color} text-white shadow-sm group-hover:scale-110 transition-transform duration-300`}
+                        >
+                          {item.icon}
+                        </div>
+                        <div>
+                          <p
+                            className={`text-xs font-bold bg-gradient-to-r ${item.color} bg-clip-text text-transparent uppercase tracking-wide`}
+                          >
+                            {item.time}
+                          </p>
+                          <h3 className="text-sm font-bold text-gray-900 group-hover:text-primary transition-colors duration-300">
+                            {item.title}
+                          </h3>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* Mobile/Tablet Horizontal Scroll */}
+              <div className="lg:hidden">
+                <div className="flex gap-4 overflow-x-auto pb-4 px-4 -mx-4 scrollbar-hide">
+                  {[
+                    {
+                      time: "9:00 - 10:00 AM",
+                      title: "Registration & Networking",
+                      icon: <UserGroupIcon className="w-5 h-5" />,
+                      color: "from-blue-500 to-indigo-600",
+                    },
+                    {
+                      time: "10:00 AM - 12:00 PM",
+                      title: "Public Function",
+                      icon: <SparklesIcon className="w-5 h-5" />,
+                      color: "from-purple-500 to-pink-600",
+                    },
+                    {
+                      time: "12:00 - 12:30 PM",
+                      title: "Group Photos",
+                      icon: <CameraIcon className="w-5 h-5" />,
+                      color: "from-green-500 to-teal-600",
+                    },
+                    {
+                      time: "12:30 - 1:00 PM",
+                      title: "Meet & Greet",
+                      icon: <MapPinIcon className="w-5 h-5" />,
+                      color: "from-yellow-500 to-orange-600",
+                    },
+                    {
+                      time: "1:00 - 2:00 PM",
+                      title: "Lunch Break",
+                      icon: (
+                        <svg
+                          className="w-5 h-5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                          />
+                        </svg>
+                      ),
+                      color: "from-red-500 to-pink-600",
+                    },
+                    {
+                      time: "2:00 - 5:30 PM",
+                      title: "Cultural Programs",
+                      icon: <MusicalNoteIcon className="w-5 h-5" />,
+                      color: "from-indigo-500 to-purple-600",
+                    },
+                    {
+                      time: "5:30 - 6:00 PM",
+                      title: "Tea & Networking",
+                      icon: (
+                        <svg
+                          className="w-5 h-5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M17.5 8a2.5 2.5 0 00-5 0c0 .92.498 1.725 1.238 2.166C14.526 10.758 15 11.845 15 13c0 .345-.027.683-.08 1.013a1.5 1.5 0 001.08 1.487c.673 0 1.22-.548 1.22-1.22V13c0-1.657 1.343-3 3-3s3 1.343 3 3c0 .345-.027.683-.08 1.013a1.5 1.5 0 001.08 1.487c.673 0 1.22-.548 1.22-1.22V13c0-1.657-1.343-3-3-3z"
+                          />
+                        </svg>
+                      ),
+                      color: "from-teal-500 to-cyan-600",
+                    },
+                    {
+                      time: "6:00 - 8:00 PM",
+                      title: "Live Entertainment",
+                      icon: (
+                        <svg
+                          className="w-5 h-5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
+                          />
+                        </svg>
+                      ),
+                      color: "from-rose-500 to-pink-600",
+                    },
+                    {
+                      time: "8:00 PM",
+                      title: "Closing",
+                      icon: (
+                        <svg
+                          className="w-5 h-5"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth="2"
+                            d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"
+                          />
+                        </svg>
+                      ),
+                      color: "from-amber-500 to-yellow-600",
+                    },
+                  ].map((item, index) => (
+                    <div
+                      key={index}
+                      className="flex-shrink-0 w-40 bg-white rounded-xl p-3 shadow-md border border-gray-100 hover:shadow-lg transform hover:scale-105 transition-all duration-300 cursor-pointer group"
+                    >
+                      <div className="flex items-center gap-2 mb-2">
+                        <div
+                          className={`p-1.5 rounded-lg bg-gradient-to-br ${item.color} text-white shadow-sm group-hover:scale-110 transition-transform duration-300`}
+                        >
+                          {item.icon}
+                        </div>
+                      </div>
+                      <p
+                        className={`text-xs font-bold bg-gradient-to-r ${item.color} bg-clip-text text-transparent uppercase tracking-wide mb-1`}
+                      >
+                        {item.time}
+                      </p>
+                      <h3 className="text-sm font-bold text-gray-900 group-hover:text-primary transition-colors duration-300">
+                        {item.title}
+                      </h3>
+                    </div>
+                  ))}
+                </div>
+                <p className="text-center text-sm text-gray-500 mt-2">
+                  ← Swipe to view all events →
+                </p>
+              </div>
+            </motion.div>
+
+            {/* Compact Call to action */}
+            <motion.div
+              initial={{ y: 20, opacity: 0 }}
+              whileInView={{ y: 0, opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              viewport={{ once: true }}
+              className="text-center mt-8"
+            >
+              <Link
+                to="/register"
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-primary to-primary-dark hover:from-primary-dark hover:to-primary text-white px-6 py-3 rounded-xl font-semibold shadow-lg hover:shadow-xl transition-all duration-300"
+              >
+                Register for Summit 2025
+                <ArrowRightIcon className="w-4 h-4" />
+              </Link>
+            </motion.div>
+          </div>
+        </section>
+
         {/* Event Details */}
         <section
           ref={eventDetailsRef}
@@ -713,13 +1050,13 @@ const Home = () => {
                     Register Today
                     <ArrowRightIcon className="w-5 h-5" />
                   </Link>
-                  <Link
+                  {/* <Link
                     to="#event-details"
                     className="inline-flex items-center justify-center gap-2 border-2 border-white/70 hover:border-white hover:bg-white/10 px-8 py-4 text-xl font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300"
                   >
                     View Details
                     <ChevronDownIcon className="w-5 h-5" />
-                  </Link>
+                  </Link> */}
                 </div>
               </motion.div>
             </div>
@@ -744,7 +1081,13 @@ const Home = () => {
               </h2>
               <p className="max-w-3xl mx-auto text-lg text-gray-600">
                 Find answers to common questions about the UNMA 2025 event. If
-                you can't find what you're looking for, feel free to contact us.
+                you can't find what you're looking for, feel free to{" "}
+                <Link
+                  to="/contact"
+                  className="text-primary hover:text-primary-dark underline"
+                >
+                  contact us.
+                </Link>
               </p>
             </motion.div>
 
@@ -791,6 +1134,22 @@ const Home = () => {
                   question: "Will accommodation be arranged?",
                   answer:
                     "Yes, we will connect you with accommodation options near the venue. You can specify your requirements during registration.",
+                },
+                {
+                  question:
+                    "During registration, I am getting an ' internal server error', what should I do?",
+                  answer: (
+                    <>
+                      This could be related to network issues. Please refresh
+                      the page and try again later. If the problem persists,{" "}
+                      <Link
+                        to="/report-issue"
+                        className="text-primary hover:text-primary-dark underline"
+                      >
+                        report issue page
+                      </Link>{" "}
+                    </>
+                  ),
                 },
                 {
                   question: "How do I submit a suggestion ?",
