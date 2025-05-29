@@ -4,7 +4,7 @@ import { loadScript } from "../../utils/razorpay";
 import { toast } from "react-toastify";
 import { usePayment } from "../../hooks/usePayment";
 import registrationsApi from "../../api/registrationsApi";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 const RegistrationType = ({ onSelectType }) => {
   const { initiatePayment } = usePayment();
   const [showContributionModal, setShowContributionModal] = useState(false);
@@ -111,22 +111,28 @@ const RegistrationType = ({ onSelectType }) => {
             isAttending: "No",
           },
           onSuccess: async (response) => {
-              const registrationId = uuidv4();
+            const registrationId = uuidv4();
             let payload = {
               amount: parseInt(data.amount),
               name: "Anonymous",
               email: "anonymous@example.com",
               contact: "0000000000",
               currency: "INR",
+              isAnonymous: true,
               paymentMethod: "razorpay",
               paymentGatewayResponse: response,
               purpose: "contribution",
-            };    
-            try { 
-              await registrationsApi.transactionRegister(registrationId, payload);
+            };
+            try {
+              await registrationsApi.transactionRegister(
+                registrationId,
+                payload
+              );
             } catch (error) {
               console.error("Transaction registration failed:", error);
-              toast.error("Transaction registration failed. Please try again later.");
+              toast.error(
+                "Transaction registration failed. Please try again later."
+              );
             }
 
             toast.success("Thank you for your contribution!");
@@ -345,7 +351,12 @@ const RegistrationType = ({ onSelectType }) => {
           <button
             key={type.id}
             onClick={() => onSelectType(type.id)}
-            className="border rounded-lg p-6 hover:border-blue-500 hover:shadow-md transition-all flex flex-col items-center text-center"
+            disabled={type.id !== "Alumni"}
+            className={`border rounded-lg p-6 transition-all flex flex-col items-center text-center ${
+              type.id !== "Alumni"
+                ? "border-gray-300 bg-gray-100 text-gray-400 cursor-not-allowed opacity-60"
+                : "hover:border-blue-500 hover:shadow-md border-gray-200 bg-white text-gray-900 cursor-pointer"
+            }`}
           >
             <div className="mb-4">{type.icon}</div>
             <h3 className="text-xl font-semibold mb-2">{type.title}</h3>

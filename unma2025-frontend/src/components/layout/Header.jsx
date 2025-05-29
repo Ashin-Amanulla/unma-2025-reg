@@ -255,8 +255,28 @@ const Header = () => {
 };
 
 const FloatingCreditButton = () => {
+  const [isVisible, setIsVisible] = useState(true);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollY = window.scrollY;
+      const windowHeight = window.innerHeight;
+      const fullHeight = document.body.offsetHeight;
+
+      // Hide button when 100px or less from bottom
+      if (scrollY + windowHeight >= fullHeight - 100) {
+        setIsVisible(false);
+      } else {
+        setIsVisible(true);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
-    <div className="fixed bottom-6 right-6 z-40">
+    <div className={`fixed bottom-6 right-6 z-40 transition-opacity duration-300 ${isVisible ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
       <a
         href="https://xyvin.com"
         target="_blank"
@@ -265,18 +285,7 @@ const FloatingCreditButton = () => {
         title="Visit Xyvin - Web Development Company"
       >
         <span className="flex items-center space-x-2">
-          <span>Crafted </span>
-          {/* <svg
-            className="h-4 w-4 text-red-400 animate-pulse"
-            fill="currentColor"
-            viewBox="0 0 20 20"
-          >
-            <path
-              fillRule="evenodd"
-              d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z"
-              clipRule="evenodd"
-            />
-          </svg> */}
+          <span>Crafted</span>
           <span className="font-semibold">by Xyvin</span>
         </span>
       </a>

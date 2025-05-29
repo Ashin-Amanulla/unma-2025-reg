@@ -34,7 +34,6 @@ router.post('/verify-payment', async (req, res) => {
     const { razorpay_payment_id, razorpay_order_id, razorpay_signature } = req.body;
     try {
         const payment = await razorpayInstance.payments.fetch(razorpay_payment_id);
-        console.log('payment',payment);
         res.status(200).json(payment);
     } catch (error) {
         console.error(error);

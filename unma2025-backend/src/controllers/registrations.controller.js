@@ -415,12 +415,12 @@ export const sendOtp = async (req, res) => {
     await Promise.all([
       console.log("sending email", email, contactNumber),
       console.log("sending whatsapp", contactNumber, otp),
-      sendEmail(
-        email,
-        "OTP Verification for UNMA 2025 Registration",
-        `Your OTP for UNMA 2025 registration is ${otp}. It will expire in 5 minutes.`
-      ),
-      sendWhatsAppOtp(contactNumber, otp),
+      // sendEmail(
+      //   email,
+      //   "OTP Verification for UNMA 2025 Registration",
+      //   `Your OTP for UNMA 2025 registration is ${otp}. It will expire in 5 minutes.`
+      // ),
+      // sendWhatsAppOtp(contactNumber, otp),
     ]);
 
     logger.info(`OTP sent to ${email} and ${contactNumber}`);
@@ -605,6 +605,21 @@ export const processPayment = async (req, res) => {
       `Payment processed successfully: ${transactionId} for registration ${id}`
     );
 
+    // Send payment confirmation email (not registration confirmation)
+    if (registration && !isAnonymous) {
+      try {
+        await sendPaymentConfirmationEmail(registration, transactionId, amount);
+        logger.info(
+          `Payment confirmation email sent to ${registration.email} after transaction registration`
+        );
+      } catch (emailError) {
+        logger.error(
+          `Failed to send payment confirmation email: ${emailError.message}`
+        );
+        // Don't fail the transaction registration if email fails
+      }
+    }
+
     // Return success response
     res.status(200).json({
       status: "success",
@@ -615,6 +630,7 @@ export const processPayment = async (req, res) => {
         amount,
         status: "completed",
         completedAt: transaction.completedAt,
+        paymentEmailSent: !isAnonymous && !!registration,
       },
     });
   } catch (error) {
@@ -878,12 +894,11 @@ export const saveRegistrationStep = async (req, res) => {
   try {
     const { id } = req.params;
     const { step, stepData, verificationToken } = req.body;
- 
+
     if (step === 1) {
-     
-      if ( stepData.formDataStructured.personalInfo.country !== "IN") {
-         stepData.formDataStructured.personalInfo.stateUT = "";
-         stepData.formDataStructured.personalInfo.district = "";
+      if (stepData.formDataStructured.personalInfo.country !== "IN") {
+        stepData.formDataStructured.personalInfo.stateUT = "";
+        stepData.formDataStructured.personalInfo.district = "";
       }
       if (stepData.formDataStructured.personalInfo.stateUT !== "Kerala") {
         stepData.formDataStructured.personalInfo.district = "";
@@ -926,7 +941,7 @@ export const saveRegistrationStep = async (req, res) => {
         cleanedData.contactNumber =
           formDataStructured.personalInfo.contactNumber;
         cleanedData.country = formDataStructured.personalInfo.country;
-        
+
         cleanedData.school = formDataStructured.personalInfo.school;
         cleanedData.yearOfPassing =
           formDataStructured.personalInfo.yearOfPassing;
@@ -1033,6 +1048,21 @@ export const saveRegistrationStep = async (req, res) => {
         { new: true, runValidators: true }
       );
 
+      // Send registration confirmation email when registration is completed (step 8)
+      if (step === 8 && updatedRegistration.formSubmissionComplete) {
+        try {
+          await sendConfirmationEmailHelper(updatedRegistration);
+          logger.info(
+            `Registration confirmation email sent to ${updatedRegistration.email} for completed registration ${updatedRegistration._id}`
+          );
+        } catch (emailError) {
+          logger.error(
+            `Failed to send registration confirmation email: ${emailError.message}`
+          );
+          // Don't fail the registration completion if email fails
+        }
+      }
+
       // Return updated registration
       return res.status(200).json({
         status: "success",
@@ -1041,6 +1071,8 @@ export const saveRegistrationStep = async (req, res) => {
           registrationId: updatedRegistration._id,
           currentStep: step,
           isComplete: updatedRegistration.formSubmissionComplete || false,
+          confirmationEmailSent:
+            step === 8 && updatedRegistration.formSubmissionComplete,
         },
       });
     }
@@ -1177,10 +1209,10 @@ export const transactionRegister = async (req, res) => {
       notes,
     } = req.body;
 
-     // Generate unique transaction ID
-     const transactionId = `TXN-${Date.now()}-${Math.floor(
-        Math.random() * 10000
-      )}`;
+    // Generate unique transaction ID
+    const transactionId = `TXN-${Date.now()}-${Math.floor(
+      Math.random() * 10000
+    )}`;
     const transaction = await Transaction.create({
       amount,
       transactionId: transactionId,
@@ -1196,18 +1228,649 @@ export const transactionRegister = async (req, res) => {
       notes,
     });
 
-    const registration = await Registration.findByIdAndUpdate(id, {
-      $set: {
-        paymentStatus: "Completed",
-        
-      },
-    });
+    if (purpose === "registration") {
+      const registration = await Registration.findByIdAndUpdate(
+        id,
+        {
+          $set: {
+            paymentStatus: "Completed",
+            paymentId: transactionId,
+            contributionAmount: amount,
+            willContribute: true,
+            lastUpdated: new Date(),
+          },
+        },
+        { new: true }
+      );
 
+      // Send payment confirmation email (not registration confirmation)
+      if (registration && !isAnonymous) {
+        try {
+          await sendPaymentConfirmationEmail(
+            registration,
+            transactionId,
+            amount
+          );
+          logger.info(
+            `Payment confirmation email sent to ${registration.email} after transaction registration`
+          );
+        } catch (emailError) {
+          logger.error(
+            `Failed to send payment confirmation email: ${emailError.message}`
+          );
+          // Don't fail the transaction registration if email fails
+        }
+      }
+    }
     res.status(200).json({
       status: "success",
       message: "Transaction registered successfully",
+      data: {
+        transactionId,
+        registrationId: id,
+        amount,
+        status: "completed",
+      },
     });
   } catch (error) {
     logger.error(`Error registering transaction: ${error.message}`);
+    res.status(500).json({
+      status: "error",
+      message: "Internal server error",
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * Helper function to send payment confirmation email
+ */
+const sendPaymentConfirmationEmail = async (
+  registration,
+  transactionId,
+  amount
+) => {
+  const emailTemplate = `
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>UNMA Summit 2025 - Payment Confirmation</title>
+      <style>
+          body {
+              font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+              line-height: 1.6;
+              color: #333;
+              max-width: 600px;
+              margin: 0 auto;
+              padding: 20px;
+              background-color: #f9f9f9;
+          }
+          .container {
+              background: white;
+              padding: 30px;
+              border-radius: 10px;
+              box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+          }
+          .header {
+              text-align: center;
+              border-bottom: 3px solid #28a745;
+              padding-bottom: 20px;
+              margin-bottom: 30px;
+          }
+          .logo {
+              font-size: 28px;
+              font-weight: bold;
+              color: #2c5aa0;
+              margin-bottom: 10px;
+          }
+          .title {
+              font-size: 24px;
+              color: #28a745;
+              margin-bottom: 10px;
+          }
+          .greeting {
+              font-size: 18px;
+              color: #333;
+              margin-bottom: 20px;
+          }
+          .success-box {
+              background-color: #d4edda;
+              border: 1px solid #c3e6cb;
+              color: #155724;
+              padding: 20px;
+              border-radius: 8px;
+              text-align: center;
+              font-size: 18px;
+              font-weight: bold;
+              margin: 20px 0;
+          }
+          .section {
+              margin-bottom: 25px;
+              padding: 20px;
+              background-color: #f8f9fa;
+              border-radius: 8px;
+              border-left: 4px solid #28a745;
+          }
+          .section-title {
+              font-size: 18px;
+              font-weight: bold;
+              color: #28a745;
+              margin-bottom: 15px;
+              text-transform: uppercase;
+          }
+          .info-grid {
+              display: grid;
+              grid-template-columns: 1fr 2fr;
+              gap: 10px;
+              margin-bottom: 10px;
+          }
+          .info-label {
+              font-weight: bold;
+              color: #555;
+          }
+          .info-value {
+              color: #333;
+          }
+          .amount {
+              font-size: 24px;
+              font-weight: bold;
+              color: #28a745;
+              text-align: center;
+              margin: 20px 0;
+          }
+          .footer {
+              text-align: center;
+              margin-top: 30px;
+              padding-top: 20px;
+              border-top: 2px solid #e9ecef;
+              color: #666;
+          }
+          .note {
+              background-color: #e7f3ff;
+              border: 1px solid #bee5eb;
+              color: #0c5460;
+              padding: 15px;
+              border-radius: 5px;
+              margin: 20px 0;
+          }
+          @media (max-width: 600px) {
+              .info-grid {
+                  grid-template-columns: 1fr;
+              }
+          }
+      </style>
+  </head>
+  <body>
+      <div class="container">
+          <div class="header">
+              <div class="logo">UNMA</div>
+              <div class="title">Payment Confirmation</div>
+          </div>
+          
+          <div class="greeting">
+              Dear ${registration.name},
+          </div>
+          
+          <div class="success-box">
+              ✅ Payment Successful!
+          </div>
+          
+          <p>Thank you for your contribution to UNMA Summit 2025. Your payment has been processed successfully.</p>
+          
+          <div class="amount">
+              Amount Paid: ₹${amount}
+          </div>
+          
+          <div class="section">
+              <div class="section-title">Payment Details</div>
+              <div class="info-grid">
+                  <div class="info-label">Transaction ID:</div>
+                  <div class="info-value">${transactionId}</div>
+                  <div class="info-label">Payment Date:</div>
+                  <div class="info-value">${new Date().toLocaleDateString(
+                    "en-IN",
+                    {
+                      year: "numeric",
+                      month: "long",
+                      day: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    }
+                  )}</div>
+                  <div class="info-label">Amount:</div>
+                  <div class="info-value">₹${amount}</div>
+                  <div class="info-label">Status:</div>
+                  <div class="info-value" style="color: #28a745; font-weight: bold;">Completed</div>
+              </div>
+          </div>
+          
+          <div class="section">
+              <div class="section-title">Your Information</div>
+              <div class="info-grid">
+                  <div class="info-label">Name:</div>
+                  <div class="info-value">${registration.name}</div>
+                  <div class="info-label">Email:</div>
+                  <div class="info-value">${registration.email}</div>
+                  <div class="info-label">Contact:</div>
+                  <div class="info-value">${registration.contactNumber}</div>
+              </div>
+          </div>
+          
+          <div class="note">
+              <strong>Note:</strong> Please keep this email for your records. This serves as your payment receipt for UNMA Summit 2025.
+          </div>
+          
+          <p>If you have any questions regarding your payment, please contact us at Summit2025@unma.in</p>
+          
+          <div class="footer">
+              <p><strong>TEAM UNMA</strong></p>
+              <p>Summit2025@unma.in</p>
+              <p style="font-size: 12px; color: #999;">This is an automated payment confirmation email.</p>
+          </div>
+      </div>
+  </body>
+  </html>
+  `;
+
+  await sendEmail(
+    registration.email,
+    "UNMA Summit 2025 - Payment Confirmation",
+    emailTemplate
+  );
+};
+
+/**
+ * Helper function to send registration confirmation email
+ */
+const sendConfirmationEmailHelper = async (registration) => {
+  // Get attendee counts from formDataStructured
+  const attendanceData = registration.formDataStructured?.eventAttendance || {};
+  const attendees = attendanceData.attendees || {};
+
+  console.log(attendees);
+
+  // Handle both array format (legacy) and object format (current)
+  let counts = {
+    adults: { veg: 0, nonVeg: 0 },
+    teen: { veg: 0, nonVeg: 0 },
+    child: { veg: 0, nonVeg: 0 },
+    toddler: { veg: 0, nonVeg: 0 },
+  };
+
+  // Check if attendees is already in counts format (object with veg/nonVeg counts)
+  if (attendees && typeof attendees === "object" && !Array.isArray(attendees)) {
+    // Map the frontend format to our email template format
+    counts = {
+      adults: attendees.adults || { veg: 0, nonVeg: 0 },
+      teen: attendees.teens || { veg: 0, nonVeg: 0 },
+      child: attendees.children || { veg: 0, nonVeg: 0 },
+      toddler: attendees.toddlers || { veg: 0, nonVeg: 0 },
+    };
+  } else if (Array.isArray(attendees)) {
+    // Legacy format - calculate counts from array
+    attendees.forEach((attendee) => {
+      const ageGroup = attendee.ageGroup || "adults";
+      const foodPreference = attendee.foodPreference || "veg";
+
+      if (counts[ageGroup] && counts[ageGroup][foodPreference] !== undefined) {
+        counts[ageGroup][foodPreference]++;
+      }
+    });
+  }
+
+  // Get sponsorship details
+  const sponsorshipData = registration.formDataStructured?.sponsorship || {};
+
+  // Create email template
+  const emailTemplate = `
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>UNMA Summit 2025 - Registration Confirmation</title>
+      <style>
+          body {
+              font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+              line-height: 1.6;
+              color: #333;
+              max-width: 800px;
+              margin: 0 auto;
+              padding: 20px;
+              background-color: #f9f9f9;
+          }
+          .container {
+              background: white;
+              padding: 30px;
+              border-radius: 10px;
+              box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+          }
+          .header {
+              text-align: center;
+              border-bottom: 3px solid #2c5aa0;
+              padding-bottom: 20px;
+              margin-bottom: 30px;
+          }
+          .logo {
+              font-size: 28px;
+              font-weight: bold;
+              color: #2c5aa0;
+              margin-bottom: 10px;
+          }
+          .title {
+              font-size: 24px;
+              color: #2c5aa0;
+              margin-bottom: 10px;
+          }
+          .greeting {
+              font-size: 18px;
+              color: #333;
+              margin-bottom: 20px;
+          }
+          .section {
+              margin-bottom: 25px;
+              padding: 20px;
+              background-color: #f8f9fa;
+              border-radius: 8px;
+              border-left: 4px solid #2c5aa0;
+          }
+          .section-title {
+              font-size: 18px;
+              font-weight: bold;
+              color: #2c5aa0;
+              margin-bottom: 15px;
+              text-transform: uppercase;
+          }
+          .info-grid {
+              display: grid;
+              grid-template-columns: 1fr 2fr;
+              gap: 10px;
+              margin-bottom: 10px;
+          }
+          .info-label {
+              font-weight: bold;
+              color: #555;
+          }
+          .info-value {
+              color: #333;
+          }
+          .schedule-item {
+              margin-bottom: 8px;
+              padding: 8px;
+              background: white;
+              border-radius: 4px;
+              border-left: 3px solid #28a745;
+          }
+          .highlight {
+              background-color: #e7f3ff;
+              padding: 15px;
+              border-radius: 5px;
+              text-align: center;
+              font-weight: bold;
+              color: #2c5aa0;
+              margin: 20px 0;
+          }
+          .attendee-counts {
+              display: grid;
+              grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+              gap: 15px;
+          }
+          .count-card {
+              background: white;
+              padding: 15px;
+              border-radius: 5px;
+              text-align: center;
+              border: 2px solid #e9ecef;
+          }
+          .count-title {
+              font-weight: bold;
+              color: #2c5aa0;
+              margin-bottom: 10px;
+          }
+          .footer {
+              text-align: center;
+              margin-top: 30px;
+              padding-top: 20px;
+              border-top: 2px solid #e9ecef;
+              color: #666;
+          }
+          .note {
+              background-color: #fff3cd;
+              border: 1px solid #ffeaa7;
+              color: #856404;
+              padding: 15px;
+              border-radius: 5px;
+              margin: 20px 0;
+          }
+          @media (max-width: 600px) {
+              .info-grid {
+                  grid-template-columns: 1fr;
+              }
+              .attendee-counts {
+                  grid-template-columns: 1fr;
+              }
+          }
+      </style>
+  </head>
+  <body>
+      <div class="container">
+          <div class="header">
+              <div class="logo">UNMA</div>
+              <div class="title">Summit 2025 Registration Confirmation</div>
+          </div>
+          
+          <div class="greeting">
+              Dear ${registration.name},
+          </div>
+          
+          <p><strong>Congratulations!</strong> You have successfully registered for UNMA Summit 2025. Kindly find below the registration and event details.</p>
+          
+          <div class="section">
+              <div class="section-title">Event Details</div>
+              <div class="info-grid">
+                  <div class="info-label">Venue:</div>
+                  <div class="info-value">CIAL Convention Center, Kochi, Kerala</div>
+                  <div class="info-label">Date & Time:</div>
+                  <div class="info-value">30 Aug 2025, 09:00 AM to 8:00 PM</div>
+              </div>
+          </div>
+          
+          <div class="section">
+              <div class="section-title">Program Schedule</div>
+              <p style="font-style: italic; color: #666; margin-bottom: 15px;">*Tentative Schedule (Based on BOT Meeting)</p>
+              <div class="schedule-item"><strong>9:00 AM - 10:00 AM:</strong> Registration & Networking</div>
+              <div class="schedule-item"><strong>10:00 AM - 12:00 PM:</strong> Public Function</div>
+              <div class="schedule-item"><strong>12:00 PM - 12:30 PM:</strong> Group Photo</div>
+              <div class="schedule-item"><strong>12:30 PM - 1:00 PM:</strong> Networking, Visit Stalls</div>
+              <div class="schedule-item"><strong>1:00 PM - 2:00 PM:</strong> Lunch Break</div>
+              <div class="schedule-item"><strong>2:00 PM - 5:30 PM:</strong> Cultural Programs</div>
+              <div class="schedule-item"><strong>5:30 PM - 6:00 PM:</strong> Tea & Networking</div>
+              <div class="schedule-item"><strong>6:00 PM - 8:00 PM:</strong> Live Entertainment</div>
+              <div class="schedule-item"><strong>8:00 PM:</strong> Closing</div>
+          </div>
+          
+          <div class="section">
+              <div class="section-title">Your Personal Information</div>
+              <div class="info-grid">
+                  <div class="info-label">Full Name:</div>
+                  <div class="info-value">${registration.name}</div>
+                  <div class="info-label">Email:</div>
+                  <div class="info-value">${registration.email}</div>
+                  <div class="info-label">Contact Number:</div>
+                  <div class="info-value">${registration.contactNumber}</div>
+                  <div class="info-label">WhatsApp:</div>
+                  <div class="info-value">${
+                    registration.formDataStructured?.personalInfo
+                      ?.whatsappNumber || registration.contactNumber
+                  }</div>
+                  <div class="info-label">School:</div>
+                  <div class="info-value">${registration.formDataStructured?.personalInfo?.school}</div>
+                  <div class="info-label">Year of Passing:</div>
+                  <div class="info-value">${registration.formDataStructured?.personalInfo?.yearOfPassing}</div>
+              </div>
+          </div>
+          
+          ${
+            registration.formDataStructured?.eventAttendance?.isAttending
+              ? `
+          <div class="section">
+              <div class="section-title">Event Attendance Details</div>
+              <div class="attendee-counts">
+                  <div class="count-card">
+                      <div class="count-title">Adults</div>
+                      <div>Veg: ${counts.adults.veg} | Non-Veg: ${counts.adults.nonVeg}</div>
+                  </div>
+                  <div class="count-card">
+                      <div class="count-title">12-18 Years</div>
+                      <div>Veg: ${counts.teen.veg} | Non-Veg: ${counts.teen.nonVeg}</div>
+                  </div>
+                  <div class="count-card">
+                      <div class="count-title">6-12 Years</div>
+                      <div>Veg: ${counts.child.veg} | Non-Veg: ${counts.child.nonVeg}</div>
+                  </div>
+                  <div class="count-card">
+                      <div class="count-title">2-5 Years</div>
+                      <div>Veg: ${counts.toddler.veg} | Non-Veg: ${counts.toddler.nonVeg}</div>
+                  </div>
+              </div>
+          </div>
+          `
+              : '<div class="highlight">You have indicated that you will not be attending the event.</div>'
+          }
+          
+          ${
+            sponsorshipData.isInterested
+              ? `
+          <div class="section">
+              <div class="section-title">Sponsorship Details</div>
+              <div class="info-grid">
+                  <div class="info-label">Sponsorship Interest:</div>
+                  <div class="info-value">Yes</div>
+                  <div class="info-label">Sponsorship Type:</div>
+                  <div class="info-value">${
+                    sponsorshipData.sponsorshipType || "Not specified"
+                  }</div>
+                  <div class="info-label">Company/Organization:</div>
+                  <div class="info-value">${
+                    sponsorshipData.companyName || "Not specified"
+                  }</div>
+                  ${
+                    sponsorshipData.contactPerson
+                      ? `
+                  <div class="info-label">Contact Person:</div>
+                  <div class="info-value">${sponsorshipData.contactPerson}</div>
+                  `
+                      : ""
+                  }
+              </div>
+          </div>
+          `
+              : ""
+          }
+          
+          <div class="section">
+              <div class="section-title">Payment Details</div>
+              <div class="info-grid">
+                  <div class="info-label">Payment Status:</div>
+                  <div class="info-value" style="color: #28a745; font-weight: bold;">${
+                    registration.formDataStructured?.payment?.paymentStatus
+                  }</div>
+                  <div class="info-label">Transaction ID:</div>
+                  <div class="info-value">${
+                    registration.formDataStructured?.payment?.paymentId || "N/A"
+                  }</div>
+                  <div class="info-label">Contribution Amount:</div>
+                  <div class="info-value">₹${
+                    registration.formDataStructured?.payment?.contributionAmount || 0
+                  }</div>
+              </div>
+          </div>
+          
+          <div class="note">
+              <strong>Note:</strong> Should you need to update your data, please wait for the announcement of the update page that will be released soon.
+          </div>
+          
+          <div class="highlight">
+              Thank you for your registration! We look forward to seeing you at UNMA Summit 2025.
+          </div>
+          
+          <div class="footer">
+              <p><strong>TEAM UNMA</strong></p>
+              <p>Summit2025@unma.in</p>
+              <p style="font-size: 12px; color: #999;">This is an automated confirmation email. Please do not reply to this email.</p>
+          </div>
+      </div>
+  </body>
+  </html>
+  `;
+
+  // Send confirmation email
+  await sendEmail(
+    registration.email,
+    "UNMA Summit 2025 - Registration Confirmation",
+    emailTemplate
+  );
+};
+
+/**
+ * Send registration confirmation email
+ */
+export const sendRegistrationConfirmationEmail = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Validate object ID
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        status: "error",
+        message: "Invalid registration ID",
+      });
+    }
+
+    // Find registration
+    const registration = await Registration.findById(id);
+
+    // Check if registration exists
+    if (!registration) {
+      return res.status(404).json({
+        status: "error",
+        message: "Registration not found",
+      });
+    }
+
+    // Check if registration is completed and payment is done
+    if (registration.paymentStatus !== "Completed") {
+      return res.status(400).json({
+        status: "error",
+        message: "Cannot send confirmation email for incomplete registration",
+      });
+    }
+
+    // Use the helper function to send email
+    await sendConfirmationEmailHelper(registration);
+
+    logger.info(
+      `Confirmation email sent to ${registration.email} for registration ${id}`
+    );
+
+    // Return success response
+    res.status(200).json({
+      status: "success",
+      message: "Confirmation email sent successfully",
+      data: {
+        registrationId: id,
+        email: registration.email,
+        sentAt: new Date(),
+      },
+    });
+  } catch (error) {
+    logger.error(`Error sending confirmation email: ${error.message}`);
+    res.status(500).json({
+      status: "error",
+      message: "Internal server error",
+      error: error.message,
+    });
   }
 };
