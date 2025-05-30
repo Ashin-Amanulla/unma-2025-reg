@@ -298,9 +298,9 @@ const Home = () => {
                   <div>
                     <h3 className="text-white text-lg font-semibold">Where</h3>
                     <p className="text-white text-xl font-bold">
-                      CIAL Convention Center
+                        CIAL Trade Fair and Exhibition Center
                     </p>
-                    <p className="text-white/80">Kochi, Kerala</p>
+                    <p className="text-white/80">Nedumbassery, Kochi</p>
                   </div>
                 </motion.div>
 
@@ -347,7 +347,7 @@ const Home = () => {
                   <div className="flex items-center gap-3">
                     <MapPinIcon className="w-5 h-5 text-yellow-400" />
                     <span className="text-white">
-                      CIAL Convention Centre, Kochi
+                      CIAL Trade Fair and Exhibition Center, Nedumbassery, Kochi
                     </span>
                   </div>
                   <a
@@ -936,9 +936,9 @@ const Home = () => {
                             Venue
                           </h4>
                           <p className="text-gray-800 font-medium text-lg">
-                            Airport Convention Center
+                            CIAL Trade Fair Center
                           </p>
-                          <p className="text-gray-600">Kochi, Kerala</p>
+                          <p className="text-gray-600"> Nedumbassery, Kochi</p>
                           <p className="text-sm text-gray-500 mt-2">
                             Detailed directions will be sent upon registration
                           </p>

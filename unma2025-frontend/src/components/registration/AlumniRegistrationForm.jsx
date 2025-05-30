@@ -84,6 +84,8 @@ const AlumniRegistrationForm = ({ onBack, storageKey }) => {
   const [showMissionMessage, setShowMissionMessage] = useState(false);
   const [showFinancialDifficultyDialog, setShowFinancialDifficultyDialog] =
     useState(false);
+  const [showTransportationInfoDialog, setShowTransportationInfoDialog] =
+    useState(false);
   const [alertDialogConfig, setAlertDialogConfig] = useState({
     title: "",
     message: "",
@@ -1067,6 +1069,13 @@ const AlumniRegistrationForm = ({ onBack, storageKey }) => {
     }
   }, [currentStep]);
 
+  // Add useEffect to show transportation info when entering transportation step
+  useEffect(() => {
+    if (currentStep === 5 && isAttending) {
+      setShowTransportationInfoDialog(true);
+    }
+  }, [currentStep, isAttending]);
+
   // Handle skipping optional step
   const handleSkipOptional = () => {
     // Clear all optional fields
@@ -1494,9 +1503,29 @@ const AlumniRegistrationForm = ({ onBack, storageKey }) => {
                   trigger("country");
                 }
               }}
-              placeholder="Select your country"
+              placeholder="Type to search countries..."
               isSearchable={true}
               isClearable={false}
+              filterOption={(option, inputValue) => {
+                if (!inputValue) return true;
+                const searchText = inputValue.toLowerCase();
+                const label = option.label.toLowerCase();
+                const value = option.value.toLowerCase();
+
+                // Search by country name (starts with or contains)
+                return (
+                  label.startsWith(searchText) ||
+                  label.includes(searchText) ||
+                  value.startsWith(searchText)
+                );
+              }}
+              menuPlacement="auto"
+              maxMenuHeight={200}
+              noOptionsMessage={({ inputValue }) =>
+                inputValue
+                  ? `No countries found matching "${inputValue}"`
+                  : "No countries available"
+              }
               className="react-select-container"
               classNamePrefix="react-select"
             />
@@ -1510,7 +1539,29 @@ const AlumniRegistrationForm = ({ onBack, storageKey }) => {
                 errors={errors}
                 required={true}
                 options={indianStatesOptions}
-                placeholder="Select your state/UT"
+                placeholder="Type to search states/UTs..."
+                isSearchable={true}
+                isClearable={false}
+                filterOption={(option, inputValue) => {
+                  if (!inputValue) return true;
+                  const searchText = inputValue.toLowerCase();
+                  const label = option.label.toLowerCase();
+                  const value = option.value.toLowerCase();
+
+                  // Search by state name (starts with or contains)
+                  return (
+                    label.startsWith(searchText) ||
+                    label.includes(searchText) ||
+                    value.startsWith(searchText)
+                  );
+                }}
+                menuPlacement="auto"
+                maxMenuHeight={200}
+                noOptionsMessage={({ inputValue }) =>
+                  inputValue
+                    ? `No states/UTs found matching "${inputValue}"`
+                    : "No states/UTs available"
+                }
                 onChange={(value) => {
                   setValue("stateUT", value);
                   // Clear district when state changes
@@ -1533,7 +1584,29 @@ const AlumniRegistrationForm = ({ onBack, storageKey }) => {
                 errors={errors}
                 required={true}
                 options={KERALA_DISTRICTS}
-                placeholder="Select your district"
+                placeholder="Type to search districts..."
+                isSearchable={true}
+                isClearable={false}
+                filterOption={(option, inputValue) => {
+                  if (!inputValue) return true;
+                  const searchText = inputValue.toLowerCase();
+                  const label = option.label.toLowerCase();
+                  const value = option.value.toLowerCase();
+
+                  // Search by district name (starts with or contains)
+                  return (
+                    label.startsWith(searchText) ||
+                    label.includes(searchText) ||
+                    value.startsWith(searchText)
+                  );
+                }}
+                menuPlacement="auto"
+                maxMenuHeight={200}
+                noOptionsMessage={({ inputValue }) =>
+                  inputValue
+                    ? `No districts found matching "${inputValue}"`
+                    : "No districts available"
+                }
                 onChange={(value) => {
                   setValue("district", value);
                   // Trigger validation
@@ -1554,7 +1627,29 @@ const AlumniRegistrationForm = ({ onBack, storageKey }) => {
               control={control}
               errors={errors}
               options={PROFESSION_OPTIONS}
-              placeholder="Select your profession"
+              placeholder="Type to search professions..."
+              isSearchable={true}
+              isClearable={false}
+              filterOption={(option, inputValue) => {
+                if (!inputValue) return true;
+                const searchText = inputValue.toLowerCase();
+                const label = option.label.toLowerCase();
+                const value = option.value.toLowerCase();
+
+                // Search by profession name (starts with or contains)
+                return (
+                  label.startsWith(searchText) ||
+                  label.includes(searchText) ||
+                  value.startsWith(searchText)
+                );
+              }}
+              menuPlacement="auto"
+              maxMenuHeight={200}
+              noOptionsMessage={({ inputValue }) =>
+                inputValue
+                  ? `No professions found matching "${inputValue}"`
+                  : "No professions available"
+              }
             />
 
             {profession && profession !== "Student" && (
@@ -2039,7 +2134,7 @@ const AlumniRegistrationForm = ({ onBack, storageKey }) => {
                           { value: "flight", label: "Flight" },
                           {
                             value: "looking-for-transport",
-                            label: "I’m looking for a ride",
+                            label: "I'm looking for a ride",
                           },
                           { value: "other", label: "Other" },
                           { value: "train", label: "Train" },
@@ -2858,13 +2953,18 @@ const AlumniRegistrationForm = ({ onBack, storageKey }) => {
                           <input
                             type="number"
                             min="0"
-                            value={watch(`tshirtSizes.${size.value}`) || 0}
+                            value={watch(`tshirtSizes.${size.value}`) || ""}
                             onChange={(e) => {
-                              const value = parseInt(e.target.value) || 0;
+                              const inputValue = e.target.value;
+                              const value =
+                                inputValue === ""
+                                  ? 0
+                                  : parseInt(inputValue) || 0;
                               setValue(`tshirtSizes.${size.value}`, value, {
                                 shouldValidate: true,
                               });
                             }}
+                            placeholder="0"
                             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm"
                           />
                         </div>
@@ -3113,9 +3213,7 @@ const AlumniRegistrationForm = ({ onBack, storageKey }) => {
                     <ul className="text-xs text-blue-700 space-y-1">
                       <li>
                         • Email payment receipt to:{" "}
-                        <span className="font-medium">
-                          payments@unma.in
-                        </span>
+                        <span className="font-medium">payments@unma.in</span>
                       </li>
                       <li>
                         • Include your name and registration details in the
@@ -3211,23 +3309,99 @@ const AlumniRegistrationForm = ({ onBack, storageKey }) => {
               isOpen={showMissionMessage}
               onClose={() => setShowMissionMessage(false)}
               onConfirm={() => setShowMissionMessage(false)}
-              title="Support UNMA's Mission"
+              title="Event Registration & Financial Contribution"
               message={
-                <div className="space-y-3">
-                  <p className="text-sm">
-                    This event is a fundraiser for UNMA's future activities and
-                    emergency support initiatives.
-                  </p>
-                  <p className="text-sm font-medium">
-                    UNMA alumni stand together 24/7, supporting each other
-                    through thick and thin. Your generosity strengthens this
-                    support system.
-                  </p>
-                  <div className="bg-blue-50 border border-blue-200 rounded p-3">
-                    <p className="text-blue-800 text-xs font-medium">
-                      Payment Required: You will be redirected to the payment
-                      gateway. For international payments, check the details
-                      below the payment button.
+                <div className="space-y-4 text-sm max-h-96 overflow-y-auto">
+                  <div className="space-y-3">
+                    <p className="text-sm">
+                      This event is a fundraiser for UNMA's future activities
+                      and emergency support initiatives.
+                    </p>
+                    <p className="text-sm font-medium">
+                      UNMA alumni stand together 20/7, supporting each other
+                      through thick and thin. Your generosity strengthens this
+                      support system.
+                    </p>
+                  </div>
+
+                  <div className="bg-amber-50 border border-amber-200 rounded p-4">
+                    <h4 className="font-semibold text-amber-800 mb-3">
+                      Event Registration Fees
+                    </h4>
+                    <p className="text-amber-700 mb-2">
+                      Every attendee must pay a minimum registration fee, which
+                      helps cover event day expenses. Please contribute
+                      according to your capacity, as this event also supports
+                      UNMA's future activities. The system calculates the
+                      minimum contribution based on your total attendee count.
+                    </p>
+                  </div>
+
+                  <div className="bg-blue-50 border border-blue-200 rounded p-4">
+                    <h4 className="font-semibold text-blue-800 mb-3">
+                      Payment Scenarios:
+                    </h4>
+
+                    <div className="space-y-3">
+                      <div>
+                        <p className="font-medium text-blue-800 mb-1">
+                          Paying from Abroad
+                        </p>
+                        <p className="text-blue-700 text-sm">
+                          If you don't have an Indian account/card, you can pay
+                          via foreign banks or agencies. The system will show an
+                          NRE account for payment. After paying, email your
+                          transaction details to{" "}
+                          <strong>payment@unma.in</strong>. Your status will be
+                          "Payment Pending" until verified, then updated to
+                          "Paid."
+                        </p>
+                      </div>
+
+                      <div>
+                        <p className="font-medium text-blue-800 mb-1">
+                          Paying More than Minimum
+                        </p>
+                        <p className="text-blue-700 text-sm">
+                          If you enter an amount greater than the
+                          system-calculated minimum, you can proceed with
+                          payment.
+                        </p>
+                      </div>
+
+                      <div>
+                        <p className="font-medium text-blue-800 mb-1">
+                          Paying Less than Minimum
+                        </p>
+                        <p className="text-blue-700 text-sm">
+                          If you enter an amount less than the system minimum,
+                          the system will prompt you to adjust it to the minimum
+                          before continuing.
+                        </p>
+                      </div>
+
+                      <div>
+                        <p className="font-medium text-blue-800 mb-1">
+                          Unable to Pay Minimum
+                        </p>
+                        <p className="text-blue-700 text-sm">
+                          If you cannot pay the minimum amount, you can decline
+                          payment. You won't proceed to the payment page, and
+                          your status will be marked "Not Registered." Contact
+                          your alumni association leadership, board of trustees,
+                          or batch representatives to explain your situation.
+                          They will coordinate with the organizing team to
+                          confirm your registration.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="bg-green-50 border border-green-200 rounded p-3">
+                    <p className="text-green-800 text-xs font-medium">
+                      Payment Gateway: You will be redirected to a secure
+                      payment gateway. For international payments, check the NRE
+                      account details below the payment button.
                     </p>
                   </div>
                 </div>
@@ -3293,6 +3467,89 @@ const AlumniRegistrationForm = ({ onBack, storageKey }) => {
           </p>
         </div>
       </form>
+
+      {/* Transportation Information Dialog */}
+      <AlertDialog
+        isOpen={showTransportationInfoDialog}
+        onClose={() => setShowTransportationInfoDialog(false)}
+        onConfirm={() => setShowTransportationInfoDialog(false)}
+        title="Help Us Plan Better: Alumni Travel Information"
+        message={
+          <div className="space-y-4 text-sm">
+            <p>
+              To make your travel planning smoother and to help you connect with
+              fellow alumni traveling from distant locations (especially from
+              outside Kerala), please fill in the relevant sections below. Your
+              input helps us organize group bookings for flights, trains, buses,
+              or ships, and coordinate local travel on the day of the event.
+            </p>
+
+            <div className="space-y-4">
+              <div className="bg-blue-50 border border-blue-200 rounded p-4">
+                <p className="font-semibold text-blue-800 mb-3">
+                  Section A (Optional): Traveling from Outside Kerala or Abroad
+                </p>
+                <p className="text-blue-700 mb-3">
+                  If you're traveling to Kerala before the event date and would
+                  like to connect with other alumni from your city for group
+                  travel, please enter:
+                </p>
+                <ul className="text-blue-700 space-y-2 ml-4">
+                  <li>
+                    <strong>City of Departure:</strong> Make sure to spell it
+                    exactly as it appears on railway/airline systems (no
+                    abbreviations).
+                  </li>
+                  <li>
+                    <strong>First Travel Date:</strong> The date you plan to
+                    travel to Kerala.
+                  </li>
+                </ul>
+              </div>
+
+              <div className="bg-green-50 border border-green-200 rounded p-4">
+                <p className="font-semibold text-green-800 mb-3">
+                  Section B (Optional): Traveling to the Event Venue
+                </p>
+                <p className="text-green-700 mb-3">
+                  If you are traveling on the day of the event from any location
+                  to the venue, please fill this section if:
+                </p>
+                <ul className="text-green-700 space-y-1 ml-4 mb-3">
+                  <li>You need parking at the venue.</li>
+                  <li>
+                    You can offer a ride (and have vacant seats in your
+                    vehicle).
+                  </li>
+                  <li>
+                    You need a ride and are looking for ride-sharing or a lift.
+                  </li>
+                </ul>
+                <p className="text-green-700 mb-2">
+                  <strong>In all cases, please provide:</strong>
+                </p>
+                <ul className="text-green-700 space-y-1 ml-4">
+                  <li>Your starting point's PIN code and landmark.</li>
+                </ul>
+                <p className="text-green-700 mt-2 text-sm italic">
+                  This will help us coordinate efficiently and connect you with
+                  others traveling in your area.
+                </p>
+              </div>
+            </div>
+
+            <p className="font-medium text-center text-blue-600 mt-4">
+              Thank you for helping us plan and connect everyone seamlessly!
+              🚗✈️🚂
+            </p>
+          </div>
+        }
+        confirmText="Got It!"
+        singleButton={true}
+        type="info"
+      />
+
+      {/* Mission Message Popup */}
     </>
   );
 };

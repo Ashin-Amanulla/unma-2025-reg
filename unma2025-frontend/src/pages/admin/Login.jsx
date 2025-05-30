@@ -17,8 +17,10 @@ const Login = () => {
   } = useForm({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      email: "admin@unma2025.org",
-      password: "admin123",
+      // email: "admin@unma2025.org",
+      // password: "admin123",
+      email: "",
+      password: "",
     },
   });
 

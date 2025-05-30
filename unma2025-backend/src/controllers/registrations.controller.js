@@ -1671,7 +1671,7 @@ const sendConfirmationEmailHelper = async (registration) => {
               <div class="section-title">Event Details</div>
               <div class="info-grid">
                   <div class="info-label">Venue:</div>
-                  <div class="info-value">CIAL Convention Center, Kochi, Kerala</div>
+                  <div class="info-value">CIAL Trade Fair and Exhibition Center, Nedumbassery, Kochi, Kerala</div>  
                   <div class="info-label">Date & Time:</div>
                   <div class="info-value">30 Aug 2025, 09:00 AM to 8:00 PM</div>
               </div>
