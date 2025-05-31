@@ -3339,111 +3339,28 @@ const AlumniRegistrationForm = ({ onBack, storageKey }) => {
             />
 
             {/* Mission Message Popup */}
-            <AlertDialog
-              isOpen={showMissionMessage}
-              onClose={() => setShowMissionMessage(false)}
-              onConfirm={() => setShowMissionMessage(false)}
-              title="Event Registration & Financial Contribution"
-              message={
-                <div className="space-y-4 text-sm max-h-96 overflow-y-auto">
-                  <div className="space-y-3">
-                    <p className="text-sm">
-                      This event is a fundraiser for UNMA's future activities
-                      and emergency support initiatives.
-                    </p>
-                    <p className="text-sm font-medium">
-                      UNMA alumni stand together 20/7, supporting each other
-                      through thick and thin. Your generosity strengthens this
-                      support system.
-                    </p>
-                  </div>
+         {/* Mission Message Popup */}
+<AlertDialog
+  isOpen={showMissionMessage}
+  onClose={() => setShowMissionMessage(false)}
+  onConfirm={() => setShowMissionMessage(false)}
+  title="Event Registration & Financial Contribution"
+  message={
+    <div className="space-y-4 text-sm max-h-96 overflow-y-auto">
+      <p>
+        This event supports UNMA’s ongoing activities and emergencies. All
+        attendees must pay a minimum fee based on total attendees. Pay more if
+        you wish. If paying from abroad, use the NRE account shown, and email
+        transaction details to <strong>payment@unma.in</strong>. If you cannot
+        pay the minimum, contact your alumni leadership to discuss options.
+      </p>
+    </div>
+  }
+  confirmText="I Understand"
+  singleButton={true}
+  type="info"
+/>
 
-                  <div className="bg-amber-50 border border-amber-200 rounded p-4">
-                    <h4 className="font-semibold text-amber-800 mb-3">
-                      Event Registration Fees
-                    </h4>
-                    <p className="text-amber-700 mb-2">
-                      Every attendee must pay a minimum registration fee, which
-                      helps cover event day expenses. Please contribute
-                      according to your capacity, as this event also supports
-                      UNMA's future activities. The system calculates the
-                      minimum contribution based on your total attendee count.
-                    </p>
-                  </div>
-
-                  <div className="bg-blue-50 border border-blue-200 rounded p-4">
-                    <h4 className="font-semibold text-blue-800 mb-3">
-                      Payment Scenarios:
-                    </h4>
-
-                    <div className="space-y-3">
-                      <div>
-                        <p className="font-medium text-blue-800 mb-1">
-                          Paying from Abroad
-                        </p>
-                        <p className="text-blue-700 text-sm">
-                          If you don't have an Indian account/card, you can pay
-                          via foreign banks or agencies. The system will show an
-                          NRE account for payment. After paying, email your
-                          transaction details to{" "}
-                          <strong>payment@unma.in</strong>. Your status will be
-                          "Payment Pending" until verified, then updated to
-                          "Paid."
-                        </p>
-                      </div>
-
-                      <div>
-                        <p className="font-medium text-blue-800 mb-1">
-                          Paying More than Minimum
-                        </p>
-                        <p className="text-blue-700 text-sm">
-                          If you enter an amount greater than the
-                          system-calculated minimum, you can proceed with
-                          payment.
-                        </p>
-                      </div>
-
-                      <div>
-                        <p className="font-medium text-blue-800 mb-1">
-                          Paying Less than Minimum
-                        </p>
-                        <p className="text-blue-700 text-sm">
-                          If you enter an amount less than the system minimum,
-                          the system will prompt you to adjust it to the minimum
-                          before continuing.
-                        </p>
-                      </div>
-
-                      <div>
-                        <p className="font-medium text-blue-800 mb-1">
-                          Unable to Pay Minimum
-                        </p>
-                        <p className="text-blue-700 text-sm">
-                          If you cannot pay the minimum amount, you can decline
-                          payment. You won't proceed to the payment page, and
-                          your status will be marked "Not Registered." Contact
-                          your alumni association leadership, board of trustees,
-                          or batch representatives to explain your situation.
-                          They will coordinate with the organizing team to
-                          confirm your registration.
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="bg-green-50 border border-green-200 rounded p-3">
-                    <p className="text-green-800 text-xs font-medium">
-                      Payment Gateway: You will be redirected to a secure
-                      payment gateway. For international payments, check the NRE
-                      account details below the payment button.
-                    </p>
-                  </div>
-                </div>
-              }
-              confirmText="I Understand"
-              singleButton={true}
-              type="info"
-            />
 
             {/* Contribution Warning Dialog */}
             <AlertDialog

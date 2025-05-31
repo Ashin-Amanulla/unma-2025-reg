@@ -14,7 +14,7 @@ const swaggerOptions = {
             description: 'API documentation for UNMA 2025 Registration platform',
             contact: {
                 name: 'API Support',
-                email: 'support@unma2025.org'
+                email: 'summit2025@unma.in'   
             }
         },
         servers: [

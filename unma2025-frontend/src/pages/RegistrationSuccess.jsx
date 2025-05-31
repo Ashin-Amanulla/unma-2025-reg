@@ -215,7 +215,7 @@ const RegistrationSuccess = () => {
                     🐛 Report an Issue
                   </ScrollLink>
                   <a
-                    href="mailto:support@unma.in"
+                    href="mailto:summit2025@unma.in" 
                     className="inline-flex items-center px-4 py-2 border border-blue-600 rounded-md text-blue-600 hover:bg-blue-50"
                   >
                     ✉️ Email Support
