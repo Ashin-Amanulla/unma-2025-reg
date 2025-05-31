@@ -418,7 +418,7 @@ export const sendOtp = async (req, res) => {
       sendEmail(
         email,
         "OTP Verification for UNMA 2025 Registration",
-        `Your OTP for UNMA 2025 registration is ${otp}. It will expire in 5 minutes.`
+        `Your OTP for UNMA 2025 registration is ${otp}. It will expire in 5 minutes.f`
       ),
       sendWhatsAppOtp(contactNumber, otp),
     ]);
