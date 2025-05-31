@@ -1,15 +1,12 @@
 import axios from './axios';
 import { otpInstance } from './otpAxios';
+import { toast } from 'react-toastify';
 /**
  * Registrations API Service
  * Handles event registration related API calls
  */
 const registrationsApi = {
-    /**
-     * Create a new registration
-     * @param {Object} registrationData - Registration form data
-     * @returns {Promise} - Promise with registration data
-     */
+ 
     create: async (registrationId, payload) => {
         try {
             const response = await axios.post(`/registrations/step/${registrationId || 'new'}`, payload);
@@ -38,13 +35,8 @@ const registrationsApi = {
             throw error.response?.data || { message: 'Failed to submit without payment' };
         }
     },
-    /**
-     * Verify OTP for registration
-     * @param {string} email - User email
-     * @param {string} phone - User phone
-     * @param {string} otp - OTP to verify
-     * @returns {Promise} - Promise with verification result
-     */
+
+     
     verifyOtp: async (email, phone, otp) => {
         try {
             const response = await otpInstance.post('/registrations/verify-otp', {
@@ -65,27 +57,9 @@ const registrationsApi = {
         }
     },
 
-    /**
-     * Send OTP to user's phone/email
-     * @param {string} email - User email
-     * @param {string} phone - User phone
-     * @returns {Promise} - Promise with send result
-     */
-    sendOtp: async (email, phone) => {
-        try {
-            const response = await axios.post('/registrations/send-otp', { email, phone });
-            return response.data;
-        } catch (error) {
-            throw error.response?.data || { message: 'Failed to send OTP' };
-        }
-    },
 
-    /**
-     * Process payment for registration
-     * @param {number} registrationId - Registration ID
-     * @param {Object} paymentDetails - Payment details
-     * @returns {Promise} - Promise with payment result
-     */
+   
+
     processPayment: async (registrationId, paymentDetails) => {
         try {
             const response = await axios.post(`/registrations/${registrationId}/payment`, paymentDetails);
@@ -95,11 +69,7 @@ const registrationsApi = {
         }
     },
 
-    /**
-     * Get all registrations with optional query parameters
-     * @param {string} queryParams - URL query parameters for filtering
-     * @returns {Promise} - Promise with registrations data
-     */
+   
     getAllRegistrations: async (queryParams = '') => {
         try {
             const url = queryParams ? `/registrations?${queryParams}` : '/registrations';
@@ -142,6 +112,7 @@ const registrationsApi = {
             const response = await axios.post('/registrations/send-otp', { email, contactNumber });
             return response.data;
         } catch (error) {
+            toast.error(error.response?.data?.message || 'Failed to send OTP');
             throw error.response?.data || { message: 'Failed to send OTP' };
         }
     },

@@ -365,9 +365,9 @@ export const sendOtp = async (req, res) => {
     }
 
     //check if email or contact number is already registered
-    const existingRegistration = await Registration.findOne({
-      $or: [{ email }, { contactNumber }],
-    });
+    // const existingRegistration = await Registration.findOne({
+    //   $or: [{ email }, { contactNumber }],
+    // });
 
     if (
       existingRegistration &&
