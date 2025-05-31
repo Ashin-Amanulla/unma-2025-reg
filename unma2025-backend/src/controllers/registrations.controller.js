@@ -369,16 +369,16 @@ export const sendOtp = async (req, res) => {
     //   $or: [{ email }, { contactNumber }],
     // });
 
-    if (
-      existingRegistration &&
-      existingRegistration.paymentStatus === "Completed"
-    ) {
-      return res.status(400).json({
-        status: "error",
-        message:
-          "Your registration was successful, should you need to modify your registration data, kindly wait for the release for update form.",
-      });
-    }
+    // if (
+    //   existingRegistration &&
+    //   existingRegistration.paymentStatus === "Completed"
+    // ) {
+    //   return res.status(400).json({
+    //     status: "error",
+    //     message:
+    //       "Your registration was successful, should you need to modify your registration data, kindly wait for the release for update form.",
+    //   });
+    // }
 
     // Generate OTP
     const otp = generateOTP();
