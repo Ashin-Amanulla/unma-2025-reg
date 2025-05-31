@@ -129,7 +129,7 @@ const CountdownTimer = () => {
 const Home = () => {
   const eventDetailsRef = useRef(null);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [openFaqItems, setOpenFaqItems] = useState(new Set([1])); // Start with transportation FAQ open
+  const [openFaqItems, setOpenFaqItems] = useState(new Set([0])); // Start with transportation FAQ open
   const [showCalendarDropdown, setShowCalendarDropdown] = useState(false);
 
   useEffect(() => {
