@@ -205,7 +205,7 @@ export const PROFESSION_OPTIONS = [
   { value: "Gynecologist", label: "Gynecologist" },
   { value: "Hematologist", label: "Hematologist" },
   { value: "Hepatologist", label: "Hepatologist" },
-  { value: "HomeMaker", label: "HomeMaker" },
+  { value: "HomeMaker/Housewife", label: "HomeMaker/Housewife" },
   { value: "Homeopathic Doctor", label: "Homeopathic Doctor" },
   { value: "Hotel Manager", label: "Hotel Manager" },
   { value: "HR Manager", label: "HR Manager" },

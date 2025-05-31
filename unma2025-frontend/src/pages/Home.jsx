@@ -129,6 +129,8 @@ const CountdownTimer = () => {
 const Home = () => {
   const eventDetailsRef = useRef(null);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [openFaqItems, setOpenFaqItems] = useState(new Set([1])); // Start with transportation FAQ open
+  const [showCalendarDropdown, setShowCalendarDropdown] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -138,8 +140,106 @@ const Home = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // Close calendar dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (showCalendarDropdown && !event.target.closest(".calendar-dropdown")) {
+        setShowCalendarDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showCalendarDropdown]);
+
   const scrollToEventDetails = () => {
     eventDetailsRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const toggleFaqItem = (index) => {
+    setOpenFaqItems((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(index)) {
+        newSet.delete(index);
+      } else {
+        newSet.add(index);
+      }
+      return newSet;
+    });
+  };
+
+  // Calendar helper functions
+  const formatDateForCalendar = (date, time) => {
+    // Convert to ISO format for calendar APIs
+    const eventDate = new Date(`${date}T${time}:00`);
+    return eventDate.toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+  };
+
+  const generateCalendarUrls = () => {
+    const eventDetails = {
+      title: "UNMA Summit 2025 - Reuniting Navodayan Memories",
+      startDate: "2025-08-30",
+      startTime: "09:00",
+      endTime: "20:00",
+      location:
+        "CIAL Trade Fair and Exhibition Center, Nedumbassery, Kochi, Kerala, India",
+      description:
+        "Join us for an unforgettable reunion of Jawahar Navodaya Vidyalaya Alumni and Staff. Reconnect with school friends, share stories, and create new memories. Event includes cultural programs, networking sessions, workshops, and much more!",
+    };
+
+    const startDateTime = formatDateForCalendar(
+      eventDetails.startDate,
+      eventDetails.startTime
+    );
+    const endDateTime = formatDateForCalendar(
+      eventDetails.startDate,
+      eventDetails.endTime
+    );
+
+    return {
+      google: `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(
+        eventDetails.title
+      )}&dates=${startDateTime}/${endDateTime}&details=${encodeURIComponent(
+        eventDetails.description
+      )}&location=${encodeURIComponent(eventDetails.location)}`,
+
+      outlook: `https://outlook.live.com/calendar/0/deeplink/compose?subject=${encodeURIComponent(
+        eventDetails.title
+      )}&startdt=${startDateTime}&enddt=${endDateTime}&body=${encodeURIComponent(
+        eventDetails.description
+      )}&location=${encodeURIComponent(eventDetails.location)}`,
+
+      apple: `data:text/calendar;charset=utf8,BEGIN:VCALENDAR
+VERSION:2.0
+BEGIN:VEVENT
+URL:https://unma.in
+DTSTART:${startDateTime}
+DTEND:${endDateTime}
+SUMMARY:${eventDetails.title}
+DESCRIPTION:${eventDetails.description}
+LOCATION:${eventDetails.location}
+END:VEVENT
+END:VCALENDAR`.replace(/\n/g, "%0A"),
+    };
+  };
+
+  const handleAddToCalendar = (provider) => {
+    const urls = generateCalendarUrls();
+
+    if (provider === "apple") {
+      // For Apple Calendar, create a downloadable .ics file
+      const link = document.createElement("a");
+      link.href = urls.apple;
+      link.download = "UNMA-Summit-2025.ics";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    } else {
+      // For Google and Outlook, open in new window
+      window.open(urls[provider], "_blank");
+    }
+
+    setShowCalendarDropdown(false);
   };
 
   return (
@@ -281,7 +381,7 @@ const Home = () => {
                     <p className="text-white text-xl font-bold">
                       Saturday, August 30, 2025
                     </p>
-                    <p className="text-white/80">9:00 AM - 7:30 PM</p>
+                    <p className="text-white/80">9:00 AM - 8:00 PM</p>
                   </div>
                 </motion.div>
 
@@ -298,7 +398,7 @@ const Home = () => {
                   <div>
                     <h3 className="text-white text-lg font-semibold">Where</h3>
                     <p className="text-white text-xl font-bold">
-                        CIAL Trade Fair and Exhibition Center
+                      CIAL Trade Fair and Exhibition Center
                     </p>
                     <p className="text-white/80">Nedumbassery, Kochi</p>
                   </div>
@@ -592,11 +692,19 @@ const Home = () => {
                         stroke="currentColor"
                         viewBox="0 0 24 24"
                       >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
+                        <circle
+                          cx="12"
+                          cy="12"
+                          r="8"
                           strokeWidth="2"
-                          d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                          strokeLinecap="round"
+                        />
+                        <circle
+                          cx="12"
+                          cy="12"
+                          r="3"
+                          strokeWidth="1.5"
+                          strokeLinecap="round"
                         />
                       </svg>
                     ),
@@ -738,11 +846,19 @@ const Home = () => {
                           stroke="currentColor"
                           viewBox="0 0 24 24"
                         >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
+                          <circle
+                            cx="12"
+                            cy="12"
+                            r="8"
                             strokeWidth="2"
-                            d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.246 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"
+                            strokeLinecap="round"
+                          />
+                          <circle
+                            cx="12"
+                            cy="12"
+                            r="3"
+                            strokeWidth="1.5"
+                            strokeLinecap="round"
                           />
                         </svg>
                       ),
@@ -907,19 +1023,73 @@ const Home = () => {
                       <h3 className="text-3xl font-bold text-white mb-2">
                         August 30, 2025
                       </h3>
-                      <p className="text-white/90 text-xl">9:00 AM - 7:30 PM</p>
+                      <p className="text-white/90 text-xl">9:00 AM - 8:00 PM</p>
                       <div className="mt-8 flex justify-center">
-                        <a
-                          href="#"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            // Add calendar logic here
-                          }}
-                          className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md hover:bg-white/30 px-5 py-3 rounded-lg text-white transition-all duration-300"
-                        >
-                          <CalendarIcon className="w-5 h-5" />
-                          <span>Add to Calendar</span>
-                        </a>
+                        <div className="relative calendar-dropdown">
+                          <button
+                            onClick={() =>
+                              setShowCalendarDropdown(!showCalendarDropdown)
+                            }
+                            className="inline-flex items-center gap-2 bg-white/20 backdrop-blur-md hover:bg-white/30 px-5 py-3 rounded-lg text-white transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-white/50"
+                          >
+                            <CalendarIcon className="w-5 h-5" />
+                            <span>Add to Calendar</span>
+                            <ChevronDownIcon
+                              className={`w-4 h-4 transition-transform duration-200 ${
+                                showCalendarDropdown ? "rotate-180" : ""
+                              }`}
+                            />
+                          </button>
+
+                          {/* Calendar Dropdown */}
+                          {showCalendarDropdown && (
+                            <motion.div
+                              initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                              animate={{ opacity: 1, y: 0, scale: 1 }}
+                              exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                              transition={{ duration: 0.2 }}
+                              className="absolute top-full mt-2 left-1/2 transform -translate-x-1/2 bg-white rounded-lg shadow-lg border border-gray-200 min-w-[200px] z-50"
+                            >
+                              <div className="py-2">
+                                <button
+                                  onClick={() => handleAddToCalendar("google")}
+                                  className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 transition-colors duration-200 text-gray-700"
+                                >
+                                  <div className="w-5 h-5 bg-blue-500 rounded flex items-center justify-center">
+                                    <span className="text-white text-xs font-bold">
+                                      G
+                                    </span>
+                                  </div>
+                                  <span>Google Calendar</span>
+                                </button>
+
+                                <button
+                                  onClick={() => handleAddToCalendar("outlook")}
+                                  className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 transition-colors duration-200 text-gray-700"
+                                >
+                                  <div className="w-5 h-5 bg-blue-600 rounded flex items-center justify-center">
+                                    <span className="text-white text-xs font-bold">
+                                      O
+                                    </span>
+                                  </div>
+                                  <span>Outlook Calendar</span>
+                                </button>
+
+                                <button
+                                  onClick={() => handleAddToCalendar("apple")}
+                                  className="w-full flex items-center gap-3 px-4 py-3 text-left hover:bg-gray-50 transition-colors duration-200 text-gray-700"
+                                >
+                                  <div className="w-5 h-5 bg-gray-800 rounded flex items-center justify-center">
+                                    <span className="text-white text-xs font-bold">
+                                      🍎
+                                    </span>
+                                  </div>
+                                  <span>Apple Calendar (.ics)</span>
+                                </button>
+                              </div>
+                            </motion.div>
+                          )}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -936,7 +1106,7 @@ const Home = () => {
                             Venue
                           </h4>
                           <p className="text-gray-800 font-medium text-lg">
-                            CIAL Trade Fair Center
+                            CIAL Trade Fair and Exhibition Center
                           </p>
                           <p className="text-gray-600"> Nedumbassery, Kochi</p>
                           <p className="text-sm text-gray-500 mt-2">
@@ -1109,6 +1279,85 @@ const Home = () => {
                   ),
                 },
                 {
+                  question:
+                    "How should I fill the Transportation section during registration?",
+                  answer: (
+                    <div className="space-y-4">
+                      <p>
+                        To make your travel planning smoother and to help you
+                        connect with fellow alumni traveling from distant
+                        locations (especially from outside Kerala), please fill
+                        in the relevant sections based on your travel needs.
+                      </p>
+
+                      <div className="space-y-4">
+                        <div className="bg-blue-50 border border-blue-200 rounded p-4">
+                          <p className="font-semibold text-blue-800 mb-3">
+                            Section A (Optional): Traveling from Outside Kerala
+                            or Abroad
+                          </p>
+                          <p className="text-blue-700 mb-3">
+                            If you're traveling to Kerala before the event date
+                            and would like to connect with other alumni from
+                            your city for group travel, please enter:
+                          </p>
+                          <ul className="text-blue-700 space-y-2 ml-4">
+                            <li>
+                              <strong>City of Departure:</strong> Make sure to
+                              spell it exactly as it appears on railway/airline
+                              systems (no abbreviations).
+                            </li>
+                            <li>
+                              <strong>First Travel Date:</strong> The date you
+                              plan to travel to Kerala.
+                            </li>
+                          </ul>
+                        </div>
+
+                        <div className="bg-green-50 border border-green-200 rounded p-4">
+                          <p className="font-semibold text-green-800 mb-3">
+                            Section B (Optional): Traveling to the Event Venue
+                          </p>
+                          <p className="text-green-700 mb-3">
+                            If you are traveling on the day of the event from
+                            any location to the venue, please fill this section
+                            if:
+                          </p>
+                          <ul className="text-green-700 space-y-1 ml-4 mb-3">
+                            <li>You need parking at the venue.</li>
+                            <li>
+                              You can offer a ride (and have vacant seats in
+                              your vehicle).
+                            </li>
+                            <li>
+                              You need a ride and are looking for ride-sharing
+                              or a lift.
+                            </li>
+                          </ul>
+                          <p className="text-green-700 mb-2">
+                            <strong>In all cases, please provide:</strong>
+                          </p>
+                          <ul className="text-green-700 space-y-1 ml-4">
+                            <li>
+                              Your starting point's PIN code and landmark.
+                            </li>
+                          </ul>
+                          <p className="text-green-700 mt-2 text-sm italic">
+                            This will help us coordinate efficiently and connect
+                            you with others traveling in your area.
+                          </p>
+                        </div>
+                      </div>
+
+                      <p className="font-medium text-center text-blue-600 mt-4">
+                        Your input helps us organize group bookings for flights,
+                        trains, buses, or ships, and coordinate local travel on
+                        the day of the event. 🚗✈️🚂
+                      </p>
+                    </div>
+                  ),
+                },
+                {
                   question: "Who can attend the UNMA 2025 event?",
                   answer:
                     "The event is open to all Alumni and Staff from JNVs of Kerala, Mahe and Lakshadweep and other JNV's alumni /staff residing in Kerala. You can also bring your immediate family members along.",
@@ -1173,15 +1422,40 @@ const Home = () => {
                   whileInView={{ y: 0, opacity: 1 }}
                   transition={{ duration: 0.5, delay: index * 0.1 }}
                   viewport={{ once: true }}
-                  className="mb-6"
+                  className="mb-4"
                 >
-                  <div className="group">
-                    <div className="bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors duration-300 p-6 border border-gray-100 shadow-sm hover:shadow-md">
-                      <h3 className="text-xl font-semibold mb-3 text-gray-900 group-hover:text-primary transition-colors">
+                  <div className="bg-white rounded-xl border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
+                    {/* Accordion Header */}
+                    <button
+                      onClick={() => toggleFaqItem(index)}
+                      className="w-full px-6 py-5 text-left flex items-center justify-between hover:bg-gray-50 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    >
+                      <h3 className="text-lg font-semibold text-gray-900 pr-4">
                         {item.question}
                       </h3>
-                      <p className="text-gray-600">{item.answer}</p>
-                    </div>
+                      <ChevronDownIcon
+                        className={`w-5 h-5 text-gray-500 flex-shrink-0 transition-transform duration-200 ${
+                          openFaqItems.has(index) ? "rotate-180" : ""
+                        }`}
+                      />
+                    </button>
+
+                    {/* Accordion Content */}
+                    <motion.div
+                      initial={false}
+                      animate={{
+                        height: openFaqItems.has(index) ? "auto" : 0,
+                        opacity: openFaqItems.has(index) ? 1 : 0,
+                      }}
+                      transition={{ duration: 0.3, ease: "easeInOut" }}
+                      className="overflow-hidden"
+                    >
+                      <div className="px-6 pb-5 pt-0">
+                        <div className="text-gray-600 leading-relaxed">
+                          {item.answer}
+                        </div>
+                      </div>
+                    </motion.div>
                   </div>
                 </motion.div>
               ))}

@@ -336,10 +336,22 @@ const RegistrationType = ({ onSelectType }) => {
 
   return (
     <div>
+      <div className="mb-8 p-6 bg-gradient-to-r from-red-50 to-pink-50 border border-red-200 rounded-xl shadow-sm">
+        <div className="flex items-center space-x-4">
+          <h3 className="text-lg font-semibold text-red-900 mb-2 flex items-center">
+            💻 Recommended: Use PC/Laptop for Best Experience
+          </h3>
+        </div>
+        <p className="text-blue-800 text-sm mb-3 leading-relaxed">
+        This form is quite detailed and contains multiple sections. For the best experience and easier navigation, we recommend using a PC or laptop.
+        </p>
+      </div>
+
       <div className="text-center mb-8">
         <h2 className="text-2xl font-bold text-gray-800">
           Select Your Connection to JNV
         </h2>
+
         <p className="text-gray-600 mt-2">
           Please select how you are connected to JNV for the UNMA SUMMIT 2025
           event

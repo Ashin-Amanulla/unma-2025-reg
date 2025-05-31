@@ -286,7 +286,7 @@ const FloatingCreditButton = () => {
       >
         <span className="flex items-center space-x-2">
           <span>Crafted</span>
-          <span className="font-semibold">by Xyvin</span>
+          <span className="font-semibold">by Ashin TVM</span>
         </span>
       </a>
     </div>

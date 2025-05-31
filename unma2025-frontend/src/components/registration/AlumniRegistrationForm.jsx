@@ -84,8 +84,6 @@ const AlumniRegistrationForm = ({ onBack, storageKey }) => {
   const [showMissionMessage, setShowMissionMessage] = useState(false);
   const [showFinancialDifficultyDialog, setShowFinancialDifficultyDialog] =
     useState(false);
-  const [showTransportationInfoDialog, setShowTransportationInfoDialog] =
-    useState(false);
   const [alertDialogConfig, setAlertDialogConfig] = useState({
     title: "",
     message: "",
@@ -1069,13 +1067,6 @@ const AlumniRegistrationForm = ({ onBack, storageKey }) => {
     }
   }, [currentStep]);
 
-  // Add useEffect to show transportation info when entering transportation step
-  useEffect(() => {
-    if (currentStep === 5 && isAttending) {
-      setShowTransportationInfoDialog(true);
-    }
-  }, [currentStep, isAttending]);
-
   // Handle skipping optional step
   const handleSkipOptional = () => {
     // Clear all optional fields
@@ -1865,6 +1856,49 @@ const AlumniRegistrationForm = ({ onBack, storageKey }) => {
         {/* Transportation Step */}
         {currentStep === 5 && isAttending && (
           <FormSection title="Transportation Details">
+            {/* Help Message Box */}
+            <div className="mb-6 p-4 bg-blue-50 border border-blue-300 rounded-lg shadow-sm">
+              <div className="flex items-start">
+                <div className="flex-shrink-0">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className="h-6 w-6 text-blue-500"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                    />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <h3 className="text-sm font-medium text-blue-800">
+                    Need help filling this section?
+                  </h3>
+                  <div className="mt-2 text-sm text-blue-700">
+                    <p>
+                      For detailed guidance on how to fill the transportation
+                      section, including information about two-segment travel
+                      and ride-sharing options, please check our{" "}
+                      <a
+                        href="/#faq"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 hover:text-blue-800 underline font-medium"
+                      >
+                        FAQ section
+                      </a>
+                      .
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div className="space-y-6">
               <div className="flex items-start mb-4">
                 <div className="flex items-center h-5">
@@ -2787,7 +2821,7 @@ const AlumniRegistrationForm = ({ onBack, storageKey }) => {
 
               {/* UNMA Family Groups */}
               <FormField
-                label="Are you part of UNMA family whatsapp groups?"
+                label="Are you part of any of the UNMA 1/2/3/4❤️  OneFamily Whatsapp groups?"
                 name="unmaFamilyGroups"
                 type="select"
                 control={control}
@@ -3467,87 +3501,6 @@ const AlumniRegistrationForm = ({ onBack, storageKey }) => {
           </p>
         </div>
       </form>
-
-      {/* Transportation Information Dialog */}
-      <AlertDialog
-        isOpen={showTransportationInfoDialog}
-        onClose={() => setShowTransportationInfoDialog(false)}
-        onConfirm={() => setShowTransportationInfoDialog(false)}
-        title="Help Us Plan Better: Alumni Travel Information"
-        message={
-          <div className="space-y-4 text-sm">
-            <p>
-              To make your travel planning smoother and to help you connect with
-              fellow alumni traveling from distant locations (especially from
-              outside Kerala), please fill in the relevant sections below. Your
-              input helps us organize group bookings for flights, trains, buses,
-              or ships, and coordinate local travel on the day of the event.
-            </p>
-
-            <div className="space-y-4">
-              <div className="bg-blue-50 border border-blue-200 rounded p-4">
-                <p className="font-semibold text-blue-800 mb-3">
-                  Section A (Optional): Traveling from Outside Kerala or Abroad
-                </p>
-                <p className="text-blue-700 mb-3">
-                  If you're traveling to Kerala before the event date and would
-                  like to connect with other alumni from your city for group
-                  travel, please enter:
-                </p>
-                <ul className="text-blue-700 space-y-2 ml-4">
-                  <li>
-                    <strong>City of Departure:</strong> Make sure to spell it
-                    exactly as it appears on railway/airline systems (no
-                    abbreviations).
-                  </li>
-                  <li>
-                    <strong>First Travel Date:</strong> The date you plan to
-                    travel to Kerala.
-                  </li>
-                </ul>
-              </div>
-
-              <div className="bg-green-50 border border-green-200 rounded p-4">
-                <p className="font-semibold text-green-800 mb-3">
-                  Section B (Optional): Traveling to the Event Venue
-                </p>
-                <p className="text-green-700 mb-3">
-                  If you are traveling on the day of the event from any location
-                  to the venue, please fill this section if:
-                </p>
-                <ul className="text-green-700 space-y-1 ml-4 mb-3">
-                  <li>You need parking at the venue.</li>
-                  <li>
-                    You can offer a ride (and have vacant seats in your
-                    vehicle).
-                  </li>
-                  <li>
-                    You need a ride and are looking for ride-sharing or a lift.
-                  </li>
-                </ul>
-                <p className="text-green-700 mb-2">
-                  <strong>In all cases, please provide:</strong>
-                </p>
-                <ul className="text-green-700 space-y-1 ml-4">
-                  <li>Your starting point's PIN code and landmark.</li>
-                </ul>
-                <p className="text-green-700 mt-2 text-sm italic">
-                  This will help us coordinate efficiently and connect you with
-                  others traveling in your area.
-                </p>
-              </div>
-            </div>
-
-            <p className="font-medium text-center text-blue-600 mt-4">
-              Thank you for helping us plan and connect everyone seamlessly!
-              🚗✈️🚂
-            </p>
-          </div>
-        }
-        confirmText="Got It!"
-        singleButton={true}
-        type="info"
-      />
 
       {/* Mission Message Popup */}
     </>
